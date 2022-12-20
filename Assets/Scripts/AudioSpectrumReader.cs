@@ -59,7 +59,7 @@ public class AudioSpectrumReader : MonoBehaviour
             {
                 selectedDevice = Microphone.devices[0];
                 _audioSource.outputAudioMixerGroup = mixerGroupMicrophone;
-                _audioSource.clip = Microphone.Start(selectedDevice, true, 100, AudioSettings.outputSampleRate);
+                _audioSource.clip = Microphone.Start(selectedDevice, true, 10, AudioSettings.outputSampleRate);
                 if (Microphone.IsRecording(selectedDevice))
                 {
                     while (!(Microphone.GetPosition(selectedDevice) > 0))
@@ -67,6 +67,7 @@ public class AudioSpectrumReader : MonoBehaviour
                         // wait until the microphone has started
                     }
                     _audioSource.Play();
+                    _audioSource.loop = true;
                     Debug.Log($"Recording started with {selectedDevice}: {Microphone.IsRecording(selectedDevice)}");
                 }
             }
