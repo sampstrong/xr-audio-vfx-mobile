@@ -91,8 +91,6 @@ public class AudioSpectrumReader : MonoBehaviour
         MakeBandBuffer();
         CreateAudioBandIntensity();
         GetAmplitude();
-        
-        Debug.Log($"Audio band intensity: {audioBandIntensityBuffer[4]}");
 
     }
 
