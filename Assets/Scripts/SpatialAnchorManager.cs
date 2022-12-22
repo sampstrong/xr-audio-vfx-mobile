@@ -14,7 +14,11 @@ public class SpatialAnchorManager : MonoBehaviour
   {
     public Camera Camera;
     public GameObject PrefabToPlace;
+    
     [SerializeField] private float _yOffset = 5;
+    [SerializeField] private float _zOffset = 1;
+    
+    
     public Text AnchorDisplayText;
 
     private IARSession _session = null;
@@ -54,7 +58,7 @@ public class SpatialAnchorManager : MonoBehaviour
     /// </summary>
     public void PlaceAnchor()
     {
-      var position = Camera.transform.position + new Vector3(0, _yOffset, 0);
+      var position = Camera.transform.position + new Vector3(0, _yOffset, _zOffset);
       var rotation = Camera.transform.rotation;
       
       var anchor = _session.AddAnchor(Matrix4x4.TRS(position, rotation, Vector3.one));
@@ -90,18 +94,14 @@ public class SpatialAnchorManager : MonoBehaviour
           continue;
         }
 
-        // are these needed?
-        // anchor.Transform.rotation
-        // anchor.Transform.GetPosition();
-          
 
         // Create the cube object and add a component that will keep it attached to the new anchor.
         var effectPrefab =
           Instantiate
           (
             PrefabToPlace,
-            new Vector3(0, 0, 0),
-            Quaternion.identity
+            anchor.Transform.GetPosition(),
+            anchor.Transform.rotation
           );
 
         AttachToAnchor(effectPrefab, anchor);

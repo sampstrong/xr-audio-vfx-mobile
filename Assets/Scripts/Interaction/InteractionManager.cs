@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -16,7 +17,7 @@ public class InteractionManager : Singleton<InteractionManager>
         Spawning = 2
     }
 
-    private InteractionState _interactionState;
+    [SerializeField] private InteractionState _interactionState;
 
     public InteractionState CurrentInteractionState
     {
@@ -24,21 +25,15 @@ public class InteractionManager : Singleton<InteractionManager>
         set => SetInteractionState(value); 
     }
 
-    public UnityEvent onInteractionStateChanged;
+    public event Action onInteractionStateChanged;
     
     [SerializeField] private Camera _mainCamera;
-
     
-    
-    void Start()
-    {
-        SetInteractionState(InteractionState.Inactive);
-    }
 
     private void SetInteractionState(InteractionState state)
     {
         _interactionState = state;
-        onInteractionStateChanged.Invoke();
+        onInteractionStateChanged?.Invoke();
     }
 
     public void SetStateByIndex(int index)

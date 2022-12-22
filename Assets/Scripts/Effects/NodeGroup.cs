@@ -12,15 +12,6 @@ public class NodeGroup : MonoBehaviour
     public List<Node> Nodes { get => _nodes; }
     public int NumberOfNodes { get => _numberOfNodes; }
 
-    public enum NodeState
-    {
-        Inactive = 0,
-        Active = 1,
-        Spawning = 2
-    }
-
-    public NodeState nodeState;
-    
     [Header("Nodes")]
     [SerializeField] private GameObject _nodePrefab;
     [SerializeField] private int _numberOfNodes = 10;
@@ -57,83 +48,32 @@ public class NodeGroup : MonoBehaviour
         // Assures chosen node prefab has a rigidbody that we can apply physics to
         Assert.IsNotNull(_nodePrefab.GetComponent<Rigidbody>(), 
             $"Node Prefab: {_nodePrefab.name} needs a rigidbody.");
-        
-        SetNodeState(NodeState.Active);
-        //GetInteractionState();
-        ///InteractionManager.Instance.onInteractionStateChanged.AddListener(GetInteractionState);
+
         SetBounds(_xRange, _yRange, _zRange);
         InitObjects();
+        
+        InteractionManager.Instance.onInteractionStateChanged += ChangeNodeStates;
     }
-
+    
     /// <summary>
-    /// Initializes node state based on interaction state
+    /// Sets the three-dimensional boundary for the nodes based on values assigned
+    /// in the inspector.
     /// </summary>
-    private void GetInteractionState()
+    /// <param name="xRange"></param>
+    /// <param name="yRange"></param>
+    /// <param name="zRange"></param>
+    private void SetBounds(float xRange, float yRange, float zRange)
     {
-        switch (InteractionManager.Instance.CurrentInteractionState)
-        {
-            case InteractionManager.InteractionState.Inactive:
-                SetNodeState(nodeState = NodeState.Inactive);
-                Debug.Log("Node State: Inactive");
-                break;
-            case InteractionManager.InteractionState.Active:
-                SetNodeState(nodeState = NodeState.Active);
-                Debug.Log("Node State: Active");
-                break;
-            case InteractionManager.InteractionState.Spawning:
-                SetNodeState(nodeState = NodeState.Spawning);
-                Debug.Log("Node State: Spawning");
-                break;
-            default:
-                SetNodeState(nodeState = NodeState.Active);
-                Debug.Log("Node State: Default");
-                break;
-        }
+        Vector3 currentPos = transform.position;
+
+        _xLowerBounds = currentPos.x - xRange;
+        _xUpperBounds = currentPos.x + xRange;
+        _yLowerBounds = currentPos.y - yRange;
+        _yUpperBounds = currentPos.y + yRange;
+        _zLowerBounds = currentPos.z - zRange;
+        _zUpperBounds = currentPos.z + zRange;
     }
-
-    /// <summary>
-    /// Sets the global node state and initializes each node
-    /// </summary>
-    /// <param name="state"></param>
-    [Button]
-    public void SetNodeState(NodeState state)
-    {
-        nodeState = state;
-
-        foreach (var node in _nodes)
-        {
-            InitializeNodeState(node);
-        }
-    }
-
-    /// <summary>
-    /// Sets appropriate physics for each node depending on the current node state
-    /// </summary>
-    /// <param name="node"></param>
-    private void InitializeNodeState(Node node)
-    {
-        if (nodeState == NodeState.Inactive)
-        {
-            node.rb.useGravity = true;
-            node.rb.isKinematic = false;
-        }
-        else if (nodeState == NodeState.Active)
-        {
-            node.rb.useGravity = false;
-            node.rb.isKinematic = false;
-            node.rb.velocity = SetVelocity();
-            if (node.obj.transform.position.y > _yLowerBounds + 0.5f)
-            {
-                node.rb.velocity += new Vector3(0, 2.5f, 0);
-            }
-        }
-        else if (nodeState == NodeState.Spawning)
-        {
-            node.rb.useGravity = false;
-            node.rb.isKinematic = true;
-        }
-    }
-
+    
     /// <summary>
     /// Creates a set of nodes at random positions based on the number of nodes
     /// and range specified in the inspector. Also adds a line renderer to each node
@@ -159,7 +99,7 @@ public class NodeGroup : MonoBehaviour
             node.rb = rb;
             node.rend = rend;
             
-            InitializeNodeState(node);
+            SetNodeState(node);
 
             // Initialize Lines
             for (int j = 0; j < _numberOfNodes; j++)
@@ -168,56 +108,61 @@ public class NodeGroup : MonoBehaviour
                 LineRenderer line = child.AddComponent<LineRenderer>();
                 line.material = _lineMaterial;
                 line.positionCount = 0;
-
                 node.children.Add(child);
                 node.lines.Add(line);
             }
 
+            // set node physics based on interaction state
+            SetNodeState(node);
+            
             // Add node to list
             _nodes.Add(node);
             
             // if spawning, run animation coroutine here
         }
     }
-
+    
     /// <summary>
-    /// Update handles change in line appearance and node position based on bounds
+    /// Sets appropriate physics for each node depending on the current node state
     /// </summary>
-    private void Update()
+    /// <param name="node"></param>
+    private void SetNodeState(Node node)
     {
-        DrawLines();
-        if (nodeState == NodeState.Inactive || nodeState == NodeState.Spawning) return;
-        EnforceBounds();
+        if (InteractionManager.Instance.CurrentInteractionState == InteractionManager.InteractionState.Inactive)
+        {
+            node.rb.useGravity = true;
+            node.rb.isKinematic = false;
+        }
+        else if (InteractionManager.Instance.CurrentInteractionState == InteractionManager.InteractionState.Active)
+        {
+            node.rb.useGravity = false;
+            node.rb.isKinematic = false;
+            node.rb.velocity = SetVelocity();
+            if (node.obj.transform.position.y > _yLowerBounds + 0.5f)
+            {
+                node.rb.velocity += new Vector3(0, 2.5f, 0);
+            }
+        }
+        else if (InteractionManager.Instance.CurrentInteractionState == InteractionManager.InteractionState.Spawning)
+        {
+            node.rb.useGravity = false;
+            node.rb.isKinematic = true;
+        }
     }
 
     /// <summary>
-    /// Fixed update handles changes in velocity for more predictable physics behavior
+    /// Sets the global node state and initializes each node
     /// </summary>
-    private void FixedUpdate()
+    /// <param name="state"></param>
+    [Button]
+    public void ChangeNodeStates()
     {
-        if (nodeState == NodeState.Inactive || nodeState == NodeState.Spawning) return;
-        RegulateVelocity();
+        foreach (var node in _nodes)
+        {
+            SetNodeState(node);
+        }
     }
-
-    /// <summary>
-    /// Sets the three-dimensional boundary for the nodes based on values assigned
-    /// in the inspector.
-    /// </summary>
-    /// <param name="xRange"></param>
-    /// <param name="yRange"></param>
-    /// <param name="zRange"></param>
-    private void SetBounds(float xRange, float yRange, float zRange)
-    {
-        Vector3 currentPos = transform.position;
-
-        _xLowerBounds = currentPos.x - xRange;
-        _xUpperBounds = currentPos.x + xRange;
-        _yLowerBounds = currentPos.y - yRange;
-        _yUpperBounds = currentPos.y + yRange;
-        _zLowerBounds = currentPos.z - zRange;
-        _zUpperBounds = currentPos.z + zRange;
-    }
-
+    
     /// <summary>
     /// Returns a random x, y, and z position within predefined bounds
     /// </summary>
@@ -243,6 +188,28 @@ public class NodeGroup : MonoBehaviour
         Vector3 velocity = GetRandomPosition() * randomSpeed;
         return velocity;
     }
+
+    /// <summary>
+    /// Update handles change in line appearance and node position based on bounds
+    /// </summary>
+    private void Update()
+    {
+        DrawLines();
+        if (InteractionManager.Instance.CurrentInteractionState is InteractionManager.InteractionState.Inactive
+            or InteractionManager.InteractionState.Spawning) return;
+        EnforceBounds();
+    }
+
+    /// <summary>
+    /// Fixed update handles changes in velocity for more predictable physics behavior
+    /// </summary>
+    private void FixedUpdate()
+    {
+        if (InteractionManager.Instance.CurrentInteractionState is InteractionManager.InteractionState.Inactive
+            or InteractionManager.InteractionState.Spawning) return;
+        RegulateVelocity();
+    }
+    
 
     /// <summary>
     /// Sets the velocity for each node on first frame when switching from inactive
@@ -328,7 +295,8 @@ public class NodeGroup : MonoBehaviour
     private void DrawLines()
     {
         // turn off lines for inactive and spawning states
-        if (nodeState == NodeState.Inactive || nodeState == NodeState.Spawning)
+        if (InteractionManager.Instance.CurrentInteractionState is InteractionManager.InteractionState.Inactive
+            or InteractionManager.InteractionState.Spawning)
         {
             foreach (var node in _nodes)
             {

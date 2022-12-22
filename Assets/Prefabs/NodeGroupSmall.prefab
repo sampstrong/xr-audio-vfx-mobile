@@ -1,0 +1,81 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &979743828079689663
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 979743828079689660}
+  - component: {fileID: 979743828079689661}
+  - component: {fileID: 5280618196743529792}
+  m_Layer: 0
+  m_Name: NodeGroupSmall
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &979743828079689660
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 979743828079689663}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &979743828079689661
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 979743828079689663}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48690039aaef449629f3ba872284a543, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nodeState: 1
+  _nodePrefab: {fileID: 7439328537995353995, guid: f46108f98a486446cad02ad5fc405a78,
+    type: 3}
+  _numberOfNodes: 30
+  _minScale: 0.04
+  _maxScale: 0.2
+  _speed: 0.4
+  _lineMaterial: {fileID: 2100000, guid: 8f96ebf196f4c439f90fb7c2c3bb3e81, type: 2}
+  _distanceThreshold: 1.5
+  _maxLineWidth: 1000
+  _minLineWidth: 40
+  _xRange: 2
+  _yRange: 0.5
+  _zRange: 4
+  _velocityUpperLimit: 1
+  _velocityLowerLimit: 0.2
+--- !u!114 &5280618196743529792
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 979743828079689663}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57325c0a6045d4ad68b54ca6b3f96554, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _band: 5
+  _nodeGroup: {fileID: 979743828079689661}
+  _speedMin: 1
+  _speedMax: 10
+  _matOne: {fileID: 2100000, guid: 53483ba2410c94105a4a94dae2ca9931, type: 2}
+  _matTwo: {fileID: 2100000, guid: cd18311f7f826492abd9bfc55223d911, type: 2}
