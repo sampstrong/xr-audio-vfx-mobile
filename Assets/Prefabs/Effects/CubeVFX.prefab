@@ -46,11 +46,17 @@ VisualEffect:
   m_InitialEventName: OnPlay
   m_InitialEventNameOverriden: 0
   m_StartSeed: 0
-  m_ResetSeedOnPlay: 1
+  m_ResetSeedOnPlay: 0
   m_ResourceVersion: 1
   m_PropertySheet:
     m_Float:
-      m_Array: []
+      m_Array:
+      - m_Value: 0.283
+        m_Name: DissolveAmount
+        m_Overridden: 1
+      - m_Value: 0
+        m_Name: RotationAmount
+        m_Overridden: 1
     m_Vector2f:
       m_Array: []
     m_Vector3f:
@@ -128,9 +134,10 @@ MonoBehaviour:
   - {fileID: 4381350016693042482}
   _controlPlayRate: 1
   _minRate: 0.3
-  _maxRate: 5
+  _maxRate: 3
   _controlColor: 0
   _colorThreshold: 0.5
   _controlFrequency: 0
   _minFreq: 0
   _maxFreq: 0
+  _controlDissolve: 1

@@ -17,6 +17,9 @@ public class AudioVFXController : AudioController
     [Header("Turbulence Frequency")] 
     [SerializeField] private bool _controlFrequency;
     [SerializeField] private float _minFreq, _maxFreq;
+
+    [Header("Dissolve Amount")] 
+    [SerializeField] private bool _controlDissolve;
     
     
     protected override void Update()
@@ -26,6 +29,7 @@ public class AudioVFXController : AudioController
         if (_controlPlayRate)  ControlPlayRate(_audioBandIntensityBuffer);
         if (_controlColor)     ControlColor(_audioBandIntensityBuffer);
         if (_controlFrequency) ControlFrequency(_audioBandIntensityBuffer);
+        if (_controlDissolve)  ControlDissolve(_audioBandIntensityBuffer);
     }
 
     private void ControlPlayRate(float intensity)
@@ -55,6 +59,17 @@ public class AudioVFXController : AudioController
         foreach (var effect in _vFX)
         {
             effect.SetFloat("TurbulenceFreq", GetControlValue(intensity, _minFreq, _maxFreq));
+        }
+    }
+
+    private void ControlDissolve(float intensity)
+    {
+        //var amount = -intensity + 1;
+        var amount = intensity;
+        
+        foreach (var effect in _vFX)
+        {
+            effect.SetFloat("DissolveAmount", amount);
         }
     }
 }

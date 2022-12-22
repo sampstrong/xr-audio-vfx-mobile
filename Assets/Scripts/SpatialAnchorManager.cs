@@ -13,13 +13,15 @@ using UnityEngine.UI;
 public class SpatialAnchorManager : MonoBehaviour
   {
     public Camera Camera;
-    public GameObject PrefabToPlace;
+    //public GameObject PrefabToPlace;
     
     [SerializeField] private float _yOffset = 5;
     [SerializeField] private float _zOffset = 1;
     
-    
     public Text AnchorDisplayText;
+
+    private GameObject _newObject;
+    private GameObject _currentObject;
 
     private IARSession _session = null;
     private Dictionary<Guid, IARAnchor> _addedAnchors = new Dictionary<Guid, IARAnchor>();
@@ -56,8 +58,10 @@ public class SpatialAnchorManager : MonoBehaviour
     /// <summary>
     /// Places anchor at above camera based on Y offset specified in inspector
     /// </summary>
-    public void PlaceAnchor()
+    public void PlaceAnchor(GameObject objToPlace)
     {
+      _newObject = objToPlace;
+      
       var position = Camera.transform.position + new Vector3(0, _yOffset, _zOffset);
       var rotation = Camera.transform.rotation;
       
@@ -93,21 +97,28 @@ public class SpatialAnchorManager : MonoBehaviour
 
           continue;
         }
+        
+        // destroy existing effect if there is one before creating a new one
+        if (_currentObject != null)
+        {
+          Destroy(_currentObject);
+        }
 
 
         // Create the cube object and add a component that will keep it attached to the new anchor.
-        var effectPrefab =
+        var effect =
           Instantiate
           (
-            PrefabToPlace,
+            _newObject,
             anchor.Transform.GetPosition(),
             anchor.Transform.rotation
           );
 
-        AttachToAnchor(effectPrefab, anchor);
+        AttachToAnchor(effect, anchor);
 
         // Keep track of the anchor objects
-        _placedObjects.Add(anchor.Identifier, effectPrefab);
+        _placedObjects.Add(anchor.Identifier, effect);
+        _currentObject = effect;
       }
     }
 
@@ -115,7 +126,7 @@ public class SpatialAnchorManager : MonoBehaviour
     {
       var attachment = effectPrefab.AddComponent<ARAnchorAttachment>();
       attachment.AttachedAnchor = anchor;
-      var cubeYOffset = PrefabToPlace.transform.localScale.y / 2;
+      var cubeYOffset = _newObject.transform.localScale.y / 2;
       attachment.Offset = Matrix4x4.Translate(new Vector3(0, cubeYOffset, 0));
     }
 
