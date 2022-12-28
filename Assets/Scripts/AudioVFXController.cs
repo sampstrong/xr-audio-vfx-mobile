@@ -4,6 +4,9 @@ using UnityEngine.VFX;
 
 public class AudioVFXController : AudioController
 {
+    public bool Dissolve { get => _controlDissolve; }
+    public bool Rescaled { get => _rescaled; set => _rescaled = value; }
+    
     [SerializeField] private List<VisualEffect> _vFX;
     
     [Header("Play Rate")] 
@@ -20,6 +23,7 @@ public class AudioVFXController : AudioController
 
     [Header("Dissolve Amount")] 
     [SerializeField] private bool _controlDissolve;
+    [SerializeField] private bool _rescaled = false;
     
     
     protected override void Update()
@@ -64,8 +68,14 @@ public class AudioVFXController : AudioController
 
     private void ControlDissolve(float intensity)
     {
-        //var amount = -intensity + 1;
-        var amount = intensity;
+        // use if you want values to be flipped
+        // var amount = -intensity + 1;
+        
+        float sensitivity;
+        if (_rescaled) sensitivity = 0.7f;
+        else sensitivity = 1;
+        
+        var amount = intensity * sensitivity;
         
         foreach (var effect in _vFX)
         {

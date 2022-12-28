@@ -1,5 +1,6 @@
 using Niantic.ARDK.Extensions;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ObjectToggle : MonoBehaviour
 {
@@ -14,4 +15,11 @@ public class ObjectToggle : MonoBehaviour
         occlusion.enabled = !occlusion.enabled;
     }
 
+    public void ToggleDissolveSensitivity()
+    {
+        var vfxController = FindObjectOfType<AudioVFXController>();
+        if (!vfxController.Dissolve) return;
+        vfxController.Rescaled = !vfxController.Rescaled;
+        Debug.Log($"Low Dissolve Sensitivity Toggled: {vfxController.Rescaled}");
+    }
 }
