@@ -1,15 +1,16 @@
+using UnityEngine;
 using UnityEngine.Events;
 
 /// <summary>
 /// Creates global trigger events for each frequency band when they get above a certain intensity
 /// </summary>
-public class BandTrigger : Singleton<BandTrigger>
+public class BandTrigger : MonoBehaviour
 {
     public Band[] Bands { get => _bands; }
     
     // events for going above and below threshold
-    public UnityEvent[] onBandTriggered = new UnityEvent[8];
-    public UnityEvent[] onBandReleased = new UnityEvent[8];
+    // public UnityEvent[] onBandTriggered = new UnityEvent[8];
+    // public UnityEvent[] onBandReleased = new UnityEvent[8];
     
     private Band[] _bands = new Band[8];
 
@@ -47,12 +48,14 @@ public class BandTrigger : Singleton<BandTrigger>
             if (_bands[i].Intensity > 0.5f && !_bands[i].Triggered)
             {
                 _bands[i].Triggered = true;
-                onBandTriggered[i].Invoke();
+                // onBandTriggered[i].Invoke();
+                VFXEventManager.InvokeBandTriggeredEvent(i);
             }
             else if (_bands[i].Intensity < 0.5 && _bands[i].Triggered)
             {
                 _bands[i].Triggered = false;
-                onBandReleased[i].Invoke();
+                //onBandReleased[i].Invoke();
+                VFXEventManager.InvokeBandReleasedEvent(i);
             }
         }
     }

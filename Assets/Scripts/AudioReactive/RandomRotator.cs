@@ -25,12 +25,12 @@ public class RandomRotator : BandReceiver
         transform.Rotate(Vector3.right, _currentSpeed / 5 * Time.deltaTime);
     }
     
-    protected override void OnBandTriggered()
+    protected override void OnBandTriggered(int band)
     {
         _currentSpeed = _maxSpeed;
     }
 
-    protected override void OnBandReleased()
+    protected override void OnBandReleased(int band)
     {
         StartCoroutine(ReleaseWithDelay(1f));
     }

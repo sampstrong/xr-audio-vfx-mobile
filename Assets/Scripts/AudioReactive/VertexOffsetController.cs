@@ -18,12 +18,12 @@ public class VertexOffsetController : BandReceiver
       SetStrength(_min);
    }
    
-   protected override void OnBandTriggered()
+   protected override void OnBandTriggered(int band)
    {
       SetStrength(_max);
    }
 
-   protected override void OnBandReleased()
+   protected override void OnBandReleased(int band)
    {
       StartCoroutine(ReleaseWithDelay(1));
    }

@@ -11,11 +11,11 @@ public abstract class BandReceiver : MonoBehaviour
     
     protected virtual void Start()
     {
-        BandTrigger.Instance.onBandTriggered[_band].AddListener(OnBandTriggered);
-        BandTrigger.Instance.onBandTriggered[_band].AddListener(OnBandReleased);
+        VFXEventManager.onBandTriggered += OnBandTriggered;
+        VFXEventManager.onBandTriggered += OnBandReleased;
     }
 
-    protected abstract void OnBandTriggered();
+    protected abstract void OnBandTriggered(int band);
 
-    protected abstract void OnBandReleased();
+    protected abstract void OnBandReleased(int band);
 }
