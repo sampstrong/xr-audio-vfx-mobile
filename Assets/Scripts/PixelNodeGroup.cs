@@ -19,16 +19,11 @@ public class PixelNodeGroup : MonoBehaviour
         _pixelGlitch.PixelsInitialized += Init;
     }
 
-    void Update()
-    {
-        
-    }
-
     private void Init()
     {
         for (int i = 0; i < _pixelGlitch.NumberOfPixels; i++)
         {
-            var newNode = Instantiate(_nodePrefab, _pixelGlitch.CurrentPositions[i], Quaternion.identity).GetComponent<PixelNode>();
+            var newNode = Instantiate(_nodePrefab, _pixelGlitch.CurrentPositions[i], Quaternion.identity, transform).GetComponent<PixelNode>();
             newNode.Init(i, this, _pixelGlitch);
             _nodes.Add(newNode);
         }

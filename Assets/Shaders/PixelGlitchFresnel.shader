@@ -9,6 +9,7 @@ Shader "SamStrong/PixelGlitchFresnel"
         _FresnelIntensity ("Fresnel Intensity", Range(0, 10)) = 0.0
         _FresnelRamp ("Fresnel Ramp", Range(0, 10)) = 0.0
         _BackFaceMin ("Back Face Min", Range(0, 1)) = 0.05
+        _OpacityMultiplier ("Opacity Multiplier", Range(0, 1)) = 1.0
     }
     SubShader
     {
@@ -53,6 +54,7 @@ Shader "SamStrong/PixelGlitchFresnel"
             float4 _WireframeColor;
             float4 _FresnelColor;
             float _FresnelIntensity, _FresnelRamp, _BackFaceMin;
+            float _OpacityMultiplier;
 
             v2f vert (appdata v)
             {
@@ -105,6 +107,8 @@ Shader "SamStrong/PixelGlitchFresnel"
                 {
                     finalColor = clamp(fresColor + main, 0.0, 1.0);
                 }
+
+                finalColor *= _OpacityMultiplier;
                 
                 // apply fog
                 //UNITY_APPLY_FOG(i.fogCoord, finalColor);

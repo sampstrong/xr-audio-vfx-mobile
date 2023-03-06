@@ -22,9 +22,26 @@ public class PixelNode : MonoBehaviour
         _nodeGroup = nodeGroup;
         _pixelGlitch = pixelGlitch;
         _pixelGlitch.PositionUpdated += UpdateNodePosition;
+        _pixelGlitch.VerticalOffsetStarted += ToggleVis;
+        _pixelGlitch.VerticalOffsetEnded += ToggleVis;
         
         CreateLines();
         DrawLines();
+    }
+
+    private void ToggleVis()
+    {
+        if (_lines.Count <= 0) return;
+        if (_lines[0].enabled)
+        {
+            foreach (var line in _lines)
+                line.enabled = false;
+        }
+        else
+        {
+            foreach (var line in _lines)
+                line.enabled = true;
+        }
     }
 
     private void CreateLines()
@@ -41,10 +58,6 @@ public class PixelNode : MonoBehaviour
         }
     }
 
-    private void Update()
-    {
-        
-    }
     
     private void UpdateNodePosition(int index, Vector3 pos)
     {
