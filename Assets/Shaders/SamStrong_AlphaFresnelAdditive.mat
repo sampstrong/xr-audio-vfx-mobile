@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: YellowLine
-  m_Shader: {fileID: 4800000, guid: 331bd2f7a12b847e8a147051e1f637ec, type: 3}
+  m_Name: SamStrong_AlphaFresnelAdditive
+  m_Shader: {fileID: 4800000, guid: 8b6ec0ca28d3d43cdb485e0dda3f1158, type: 3}
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -19,13 +19,10 @@ Material:
   disabledShaderPasses: []
   m_SavedProperties:
     serializedVersion: 3
-    m_TexEnvs:
-    - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 82bd8f884e4a5428bb71cf4ff6ce0e33, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
+    m_TexEnvs: []
     m_Ints: []
-    m_Floats: []
+    m_Floats:
+    - _Power: 1
     m_Colors:
-    - _Color: {r: 11.313708, g: 9.627744, b: 1.552862, a: 1}
+    - _FresnelColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
