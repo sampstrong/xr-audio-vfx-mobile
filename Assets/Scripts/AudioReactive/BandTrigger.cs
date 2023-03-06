@@ -11,6 +11,8 @@ public class BandTrigger : MonoBehaviour
     // events for going above and below threshold
     // public UnityEvent[] onBandTriggered = new UnityEvent[8];
     // public UnityEvent[] onBandReleased = new UnityEvent[8];
+
+    [SerializeField] private float _triggerThreshold = 0.5f;
     
     private Band[] _bands = new Band[8];
 
@@ -33,6 +35,7 @@ public class BandTrigger : MonoBehaviour
         for (int i = 0; i < _bands.Length; i++)
         {
             _bands[i].Intensity = AudioSpectrumReader.audioBandIntensityBuffer[i];
+            
         }
         
         GetBandTrigger();
@@ -45,13 +48,13 @@ public class BandTrigger : MonoBehaviour
     {
         for (int i = 0; i < _bands.Length; i++)
         {
-            if (_bands[i].Intensity > 0.5f && !_bands[i].Triggered)
+            if (_bands[i].Intensity > _triggerThreshold && !_bands[i].Triggered)
             {
                 _bands[i].Triggered = true;
                 // onBandTriggered[i].Invoke();
                 VFXEventManager.InvokeBandTriggeredEvent(i);
             }
-            else if (_bands[i].Intensity < 0.5 && _bands[i].Triggered)
+            else if (_bands[i].Intensity < _triggerThreshold && _bands[i].Triggered)
             {
                 _bands[i].Triggered = false;
                 //onBandReleased[i].Invoke();

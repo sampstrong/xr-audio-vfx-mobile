@@ -15,6 +15,8 @@ public class PixelGlitch : MonoBehaviour
     public event Action<int, Vector3> ScaleUpdated;
     public event Action PixelsInitialized;
 
+    [SerializeField] private int _band = 1;
+
     [SerializeField] private GameObject _pixelPrefab;
     [SerializeField] private int _numberOfPixels;
     [SerializeField] private float _transitionDuration = 0.25f;
@@ -39,8 +41,10 @@ public class PixelGlitch : MonoBehaviour
     private List<Vector3> _currentScales = new List<Vector3>();
     private List<Vector3> _oldScales = new List<Vector3>();
 
-    private float _transitionTimer = 0.0f;
-    private float _transitionTime = 3.0f;
+    // private float _transitionTimer = 0.0f;
+    // private float _transitionTime = 3.0f;
+
+    private int _beatCounter = 0;
 
     [Serializable]
     public class Range
@@ -53,24 +57,13 @@ public class PixelGlitch : MonoBehaviour
     void Start()
     {
         Init();
-        PixelsInitialized += Test;
+        VFXEventManager.onBandTriggered += StartTransition;
     }
-
-    private void Test()
-    {
-        Debug.Log("Test Worked");
-    }
+    
 
     private void Update()
     {
-        _transitionTimer += Time.deltaTime;
-        if (_transitionTimer >= _transitionTime)
-        {
-            SetNewRandomPosScale();
-            StartCoroutine(Reposition(_oldPositions, _newPositions, _transitionDuration));
-            StartCoroutine(Rescale(_oldScales, _newScales, _transitionDuration));
-            _transitionTimer = 0.0f;
-        }
+        
     }
 
     private void Init()
@@ -145,6 +138,23 @@ public class PixelGlitch : MonoBehaviour
         float z = Random.Range(zMin, zMax);
 
         return new Vector3(x, y, z);
+    }
+    
+    private void StartTransition(int band)
+    {
+        if (band != _band) return;
+        _beatCounter += 1;
+        
+        Debug.Log($"Beat Count: {_beatCounter}");
+
+        if (_beatCounter == 4)
+        {
+            SetNewRandomPosScale();
+            StartCoroutine(Reposition(_oldPositions, _newPositions, _transitionDuration));
+            StartCoroutine(Rescale(_oldScales, _newScales, _transitionDuration));
+
+            _beatCounter = 0;
+        }
     }
 
     private IEnumerator Reposition(List<Vector3> oldPositions, List<Vector3> newPositions, float duration)

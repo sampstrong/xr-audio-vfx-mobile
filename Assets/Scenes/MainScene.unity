@@ -248,6 +248,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4372803}
   - component: {fileID: 4372802}
+  - component: {fileID: 4372804}
   m_Layer: 0
   m_Name: AudioManager
   m_TagString: Untagged
@@ -282,6 +283,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4372804
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4372801}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52a1b6d2f59cd415bae10deb44205319, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &35489761
 GameObject:
   m_ObjectHideFlags: 0
@@ -1082,6 +1095,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 216d11c3f95b341c99b24fa53ad39151, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _band: 1
   _pixelPrefab: {fileID: 3090928222860491499, guid: 42aa680abe11240bf8b3687afc1a7e24,
     type: 3}
   _numberOfPixels: 50
@@ -2043,7 +2057,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &907765909
 MonoBehaviour:
   m_ObjectHideFlags: 0
