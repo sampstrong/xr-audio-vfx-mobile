@@ -7,22 +7,22 @@ public class VerticalShaftGroup : MonoBehaviour
 {
     public List<VerticalShaft> Shafts => _shafts;
     
-    [SerializeField] private PixelGlitch _pixelGlitch;
+    [SerializeField] private NetworkController networkController;
     [SerializeField] private GameObject _shaftPrefab;
 
     private List<VerticalShaft> _shafts = new List<VerticalShaft>();
     
     void Awake()
     {
-        _pixelGlitch.PixelsInitialized += Init;
+        networkController.NetworkInitialized += Init;
     }
 
     private void Init()
     {
-        for (int i = 0; i < _pixelGlitch.NumberOfPixels; i++)
+        for (int i = 0; i < networkController.NetworkSize; i++)
         {
-            var newShaft = Instantiate(_shaftPrefab, _pixelGlitch.CurrentPositions[i], Quaternion.identity, transform).GetComponent<VerticalShaft>();
-            newShaft.Init(i, this, _pixelGlitch);
+            var newShaft = Instantiate(_shaftPrefab, networkController.CurrentPositions[i], Quaternion.identity, transform).GetComponent<VerticalShaft>();
+            newShaft.Init(i, this, networkController);
             _shafts.Add(newShaft);
         }
     }

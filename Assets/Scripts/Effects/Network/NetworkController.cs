@@ -5,25 +5,31 @@ using UnityEngine;
 using UnityEngine.Events;
 using Random = UnityEngine.Random;
 
-public class PixelGlitch : MonoBehaviour
+public class NetworkController : MonoBehaviour
 {
+    #region Parameter Access
     public List<Vector3> CurrentPositions => _currentPositions;
-    public List<Pixel> Pixels => _pixels;
+    //public List<Pixel> Pixels => _pixels;
     public List<Vector3> CurrentScales => _currentScales;
-    public int NumberOfPixels => _numberOfPixels;
+    public int NetworkSize => _networkSize;
     public AnimationState CurrentAnimationState => _animationState;
+    public Preset CurrentPreset => _preset;
 
     public event Action<int, Vector3> PositionUpdated;
     public event Action<int, Vector3> ScaleUpdated;
-    public event Action PixelsInitialized;
-
+    public event Action NetworkInitialized;
     public event Action VerticalOffsetStarted;
     public event Action VerticalOffsetEnded;
 
-    [SerializeField] private int _band = 1;
+    #endregion
 
-    [SerializeField] private GameObject _pixelPrefab;
-    [SerializeField] private int _numberOfPixels;
+    #region Serialized Fields
+
+    // [SerializeField] private GameObject _pixelPrefab;
+    
+    [Header("Network Parameters")]
+    [SerializeField] private int _band = 1;
+    [SerializeField] private int _networkSize;
     [SerializeField] private float _transitionDuration = 0.25f;
     
     [Header("Position")]
@@ -36,7 +42,18 @@ public class PixelGlitch : MonoBehaviour
     [SerializeField] private Range _yScaleRange;
     [SerializeField] private Range _zScaleRange;
     
-    private List<Pixel> _pixels = new List<Pixel>();
+    [Serializable]
+    public class Range
+    {
+        public float min;
+        public float max;
+    }
+
+    #endregion
+    
+    #region Private Variables
+
+    //private List<Pixel> _pixels = new List<Pixel>();
     
     private List<Vector3> _newPositions = new List<Vector3>();
     private List<Vector3> _currentPositions = new List<Vector3>();
@@ -46,11 +63,22 @@ public class PixelGlitch : MonoBehaviour
     private List<Vector3> _currentScales = new List<Vector3>();
     private List<Vector3> _oldScales = new List<Vector3>();
 
-    // private float _transitionTimer = 0.0f;
-    // private float _transitionTime = 3.0f;
-
     private int _beatCounter = 0;
 
+    #endregion
+
+    #region Enums
+
+    public enum Preset
+    {
+        Base = 0,
+        Build = 1,
+        Drop = 2,
+        Break = 3,
+    }
+
+    private Preset _preset;
+    
     public enum AnimationState
     {
         None = 0,
@@ -60,42 +88,33 @@ public class PixelGlitch : MonoBehaviour
 
     private AnimationState _animationState;
 
-    [Serializable]
-    public class Range
-    {
-        public float min;
-        public float max;
-    }
-
-    // Start is called before the first frame update
+    #endregion
+    
+    
     void Start()
     {
         Init();
-        VFXEventManager.onBandTriggered += ReactToBass;
+        VFXEventManager.onBandTriggered += ReactToBand;
     }
 
     private void Init()
     {
-        for (int i = 0; i < _numberOfPixels; i++)
+        for (int i = 0; i < _networkSize; i++)
         {
             GetRandomPosScale(out Vector3 pos, out Vector3 scale);
             AddToLists(pos, scale);
-            
-            var newObject = Instantiate(_pixelPrefab, _newPositions[i], Quaternion.identity, this.transform);
-
-            newObject.transform.localScale = _newScales[i];
-            var renderer = newObject.GetComponent<Renderer>();
-
-            var newPixel = new Pixel(newObject, renderer);
-            _pixels.Add(newPixel);
         }
 
-        PixelsInitialized?.Invoke();
-        
+        NetworkInitialized?.Invoke();
+
+        for (int i = 0; i < _networkSize; i++)
+        {
+            PositionUpdated?.Invoke(i, _newPositions[i]);
+            ScaleUpdated?.Invoke(i, _newScales[i]);
+        }
 
         _animationState = AnimationState.None;
     }
-    
 
     private void AddToLists(Vector3 pos, Vector3 scale)
     {
@@ -112,7 +131,7 @@ public class PixelGlitch : MonoBehaviour
         _oldPositions = new List<Vector3>(_newPositions);
         _oldScales = new List<Vector3>(_newScales);
         
-        for (int i = 0; i < _numberOfPixels; i++)
+        for (int i = 0; i < _networkSize; i++)
         {
             GetRandomPosScale(out Vector3 pos, out Vector3 scale);
 
@@ -150,7 +169,7 @@ public class PixelGlitch : MonoBehaviour
         return new Vector3(x, y, z);
     }
     
-    private void ReactToBass(int band)
+    private void ReactToBand(int band)
     {
         if (band != _band) return;
         _beatCounter += 1;
@@ -179,7 +198,7 @@ public class PixelGlitch : MonoBehaviour
         Debug.Log("Vertical Shift");
         
         List<Vector3> randYPositions = new List<Vector3>();
-        for (int i = 0; i < _pixels.Count; i++)
+        for (int i = 0; i < _networkSize; i++)
         {
             var newPos = GetRandomV3(0, 0, _yPosRange.min, _yPosRange.max, 0, 0);
             var newLocalPos = transform.TransformPoint(newPos);
@@ -187,7 +206,7 @@ public class PixelGlitch : MonoBehaviour
             randYPositions.Add(new Vector3(_currentPositions[i].x, newLocalPos.y, _currentPositions[i].z));
         }
 
-        StartCoroutine(ShiftVertically(_currentPositions, randYPositions, 0.25f));
+        StartCoroutine(ShiftVertically(_newPositions, randYPositions, _transitionDuration));
     }
 
     #region Animation Coroutines
@@ -198,18 +217,16 @@ public class PixelGlitch : MonoBehaviour
             
             for (float t = 0; t < duration; t += Time.deltaTime)
             {
-                for (int i = 0; i < _pixels.Count; i++)
+                for (int i = 0; i < _networkSize; i++)
                 {
                     var pos = Vector3.Lerp(oldPositions[i], newPositions[i], t / duration);
-                    _pixels[i].Obj.transform.position = pos;
                     UpdateCurrentPosition(i, pos);
                 }
                 yield return null;
             }
     
-            for (int i = 0; i < _pixels.Count; i++)
+            for (int i = 0; i < _networkSize; i++)
             {
-                _pixels[i].Obj.transform.position = newPositions[i];
                 UpdateCurrentPosition(i, newPositions[i]);
             }
 
@@ -220,18 +237,16 @@ public class PixelGlitch : MonoBehaviour
         {
             for (float t = 0; t < duration; t += Time.deltaTime)
             {
-                for (int i = 0; i < _pixels.Count; i++)
+                for (int i = 0; i < _networkSize; i++)
                 {
                     var scale = Vector3.Lerp(oldScales[i], newScales[i], t / duration);
-                    _pixels[i].Obj.transform.localScale = scale;
                     UpdateCurrentScale(i, scale);
                 }
                 yield return null;
             }
     
-            for (int i = 0; i < _pixels.Count; i++)
+            for (int i = 0; i < _networkSize; i++)
             {
-                _pixels[i].Obj.transform.localScale = newScales[i];
                 UpdateCurrentScale(i, newScales[i]);
             }
         }
@@ -243,27 +258,28 @@ public class PixelGlitch : MonoBehaviour
             
             for (float t = 0; t < duration; t += Time.deltaTime)
             {
-                for (int i = 0; i < _pixels.Count; i++)
+                for (int i = 0; i < _networkSize; i++)
                 {
                     var pos = Vector3.Lerp(oldPositions[i], newPositions[i], t / duration);
-                    _pixels[i].Obj.transform.position = pos;
+                    UpdateCurrentPosition(i, pos);
                 }
                 yield return null;
             }
-    
+
             for (float t = 0; t < duration; t += Time.deltaTime)
             {
-                for (int i = 0; i < _pixels.Count; i++)
+                for (int i = 0; i < _networkSize; i++)
                 {
                     var pos = Vector3.Lerp(newPositions[i], oldPositions[i], t / duration);
-                    _pixels[i].Obj.transform.position = pos;
+                    UpdateCurrentPosition(i, pos);
                 }
                 yield return null;
             }
     
-            for (int i = 0; i < _pixels.Count; i++)
+            for (int i = 0; i < _networkSize; i++)
             {
-                _pixels[i].Obj.transform.position = oldPositions[i];
+                UpdateCurrentPosition(i, oldPositions[i]);
+                Debug.Log("Back to OG Pos");
             }
 
             _animationState = AnimationState.None;

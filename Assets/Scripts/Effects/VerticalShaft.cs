@@ -10,7 +10,7 @@ public class VerticalShaft : MonoBehaviour
     [SerializeField] private Renderer _renderer;
     
     private VerticalShaftGroup _shaftGroup;
-    private PixelGlitch _pixelGlitch;
+    private NetworkController _networkController;
     private int _index;
 
     private enum StrobeState
@@ -25,13 +25,13 @@ public class VerticalShaft : MonoBehaviour
     private float _randomOffset;
     private float _strobeSpeed = 10.0f;
     
-    public void Init(int index,VerticalShaftGroup group, PixelGlitch pixelGlitch)
+    public void Init(int index,VerticalShaftGroup group, NetworkController networkController)
     {
         _index = index;
         _shaftGroup = group;
-        _pixelGlitch = pixelGlitch;
+        _networkController = networkController;
         
-        _pixelGlitch.PositionUpdated += UpdateNodePosition;
+        _networkController.PositionUpdated += UpdateNodePosition;
 
         _randomOffset = Random.Range(0, 100);
         
