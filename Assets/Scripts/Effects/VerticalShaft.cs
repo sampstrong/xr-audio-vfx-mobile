@@ -34,6 +34,19 @@ public class VerticalShaft : MonoBehaviour
         _pixelGlitch.PositionUpdated += UpdateNodePosition;
 
         _randomOffset = Random.Range(0, 100);
+        
+        SetInitialVis();
+    }
+
+    private void SetInitialVis()
+    {
+        var rand = Random.value;
+        
+        if (rand >= 0.5f)
+        {
+            _renderer.enabled = false;
+        }
+            
     }
 
     private void Update()

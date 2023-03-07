@@ -5,6 +5,7 @@ using UnityEngine.Rendering;
 
 public class PixelNode : MonoBehaviour
 {
+    [SerializeField] private List<Renderer> _renderers;
     [SerializeField] private Material _lineMaterial;
     [SerializeField] private float _distanceThreshold;
     [SerializeField] private float _minLineWidth;
@@ -24,9 +25,11 @@ public class PixelNode : MonoBehaviour
         _pixelGlitch.PositionUpdated += UpdateNodePosition;
         _pixelGlitch.VerticalOffsetStarted += ToggleVis;
         _pixelGlitch.VerticalOffsetEnded += ToggleVis;
+        _nodeGroup.AllNodesCreated += CreateLines;
+        _nodeGroup.AllNodesCreated += DrawLines;
         
-        CreateLines();
-        DrawLines();
+        // CreateLines();
+        // DrawLines();
     }
 
     private void ToggleVis()
@@ -46,12 +49,15 @@ public class PixelNode : MonoBehaviour
 
     private void CreateLines()
     {
+        Debug.Log($"Nodes Count: {_nodeGroup.Nodes.Count}");
+        
         for (int i = 0; i < _nodeGroup.Nodes.Count; i++)
         {
-            if (_nodeGroup.Nodes[i] == this) return;
+            // if (_nodeGroup.Nodes[i].gameObject == this.gameObject) return;
 
-            GameObject child = Instantiate(new GameObject($"Line {i}"), transform);
-            LineRenderer line = child.AddComponent<LineRenderer>();
+            LineRenderer line = new GameObject($"Line {i}").AddComponent<LineRenderer>();
+            line.transform.parent = gameObject.transform;
+            //LineRenderer line = child.AddComponent<LineRenderer>();
             line.material = _lineMaterial;
             line.positionCount = 0;
             _lines.Add(line);
@@ -72,7 +78,7 @@ public class PixelNode : MonoBehaviour
         for (int i = 0; i < _nodeGroup.Nodes.Count; i++)
         {
             if (_nodeGroup.Nodes[i] == this) return;
-            float distance = Vector3.Distance(transform.position, _nodeGroup.Nodes[i].transform.position);
+            float distance = Vector3.Distance(transform.position, _pixelGlitch.Pixels[i].Obj.transform.position);
                 
             if (distance < _distanceThreshold)
             {

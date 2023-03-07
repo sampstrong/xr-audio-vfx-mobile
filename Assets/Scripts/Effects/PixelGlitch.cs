@@ -8,6 +8,7 @@ using Random = UnityEngine.Random;
 public class PixelGlitch : MonoBehaviour
 {
     public List<Vector3> CurrentPositions => _currentPositions;
+    public List<Pixel> Pixels => _pixels;
     public List<Vector3> CurrentScales => _currentScales;
     public int NumberOfPixels => _numberOfPixels;
     public AnimationState CurrentAnimationState => _animationState;
@@ -90,6 +91,7 @@ public class PixelGlitch : MonoBehaviour
         }
 
         PixelsInitialized?.Invoke();
+        
 
         _animationState = AnimationState.None;
     }

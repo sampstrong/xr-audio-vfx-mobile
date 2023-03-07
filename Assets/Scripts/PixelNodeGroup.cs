@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -7,7 +8,9 @@ using UnityEngine.Rendering.Universal;
 public class PixelNodeGroup : MonoBehaviour
 {
     public List<PixelNode> Nodes => _nodes;
-    
+
+    public event Action AllNodesCreated; 
+
     [SerializeField] private PixelGlitch _pixelGlitch;
     [SerializeField] private GameObject _nodePrefab;
 
@@ -27,5 +30,7 @@ public class PixelNodeGroup : MonoBehaviour
             newNode.Init(i, this, _pixelGlitch);
             _nodes.Add(newNode);
         }
+        
+        AllNodesCreated?.Invoke();
     }
 }
