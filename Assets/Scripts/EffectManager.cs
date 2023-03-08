@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Niantic.ARDK.Utilities.Input.Legacy;
@@ -7,7 +8,12 @@ using UnityEngine.VFX;
 public class EffectManager : Singleton<EffectManager>
 {
     public Preset CurrentPreset => _preset;
-    
+
+    public event Action BaseStarted;
+    public event Action BuildStarted;
+    public event Action DropStarted;
+    public event Action BreakStarted;
+
     [SerializeField] private List<GameObject> _effects;
     [SerializeField] private SpatialAnchorManager _anchorManager;
 
@@ -43,10 +49,12 @@ public class EffectManager : Singleton<EffectManager>
     {
         if (PlatformAgnosticInput.touchCount > 0)
         {
+            DropStarted?.Invoke();
             _preset = Preset.Drop;
         }
         else
         {
+            BaseStarted?.Invoke();
             _preset = Preset.Base;
         }
     }

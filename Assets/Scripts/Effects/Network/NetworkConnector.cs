@@ -28,7 +28,7 @@ public class NetworkConnector : NetworkObject
         _networkController.PositionUpdated += UpdateLines;
         _networkController.VerticalOffsetStarted += ToggleVis;
         _networkController.VerticalOffsetEnded += ToggleVis;
-        _networkGroup.AllObjectsCreated += CreateLines;
+        _networkGroup.AllObjectsCreated += InitLines;
         _networkGroup.AllObjectsCreated += DrawLines;
         
     }
@@ -58,12 +58,15 @@ public class NetworkConnector : NetworkObject
         }
     }
 
-    private void CreateLines()
+    private void InitLines()
     {
+        transform.position = _networkController.CurrentPositions[_index];
+        
         for (int i = 0; i < _networkGroup.NetworkObjects.Count; i++)
         {
             LineRenderer line = new GameObject($"Line {i}").AddComponent<LineRenderer>();
             line.transform.parent = gameObject.transform;
+            line.transform.localPosition = new Vector3(0, 0, 0);
             line.material = _lineMaterial;
             line.positionCount = 0;
             _lines.Add(line);
@@ -79,11 +82,12 @@ public class NetworkConnector : NetworkObject
 
     private void DrawLines()
     {
-        if (_index == 0)
-            Debug.Log($"Connector Pos 0: {transform.position}");
         // sets up line renderers to connect to other nearby nodes when they are closer than the threshold
         for (int i = 0; i < _networkGroup.NetworkObjects.Count; i++)
         {
+            if (_networkGroup.NetworkObjects[i].transform.position == transform.position)
+                return;
+            
             float distance = Vector3.Distance(transform.position, _networkGroup.NetworkObjects[i].transform.position);
                 
             if (distance < _distanceThreshold)

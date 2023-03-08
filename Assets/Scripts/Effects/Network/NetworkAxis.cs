@@ -1,8 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Mathematics;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Rendering;
+using Random = UnityEngine.Random;
 
 [RequireComponent(typeof(NetworkFollower))]
 public class NetworkAxis : NetworkObject
@@ -16,11 +19,14 @@ public class NetworkAxis : NetworkObject
     private int _index;
     
     private float _randomOffset;
-    
+    private float _rotSpeed1;
+    private float _rotSpeed2;
 
     public void Start()
     {
         Assert.IsNotNull(_networkFollower, "Please Assign NetworkFollower component in the Inspector");
+        EffectManager.Instance.BaseStarted += InitBaseState;
+        EffectManager.Instance.DropStarted += InitDropState;
     }
 
     public override void Init(int index, NetworkGroup group, NetworkController controller)
@@ -30,6 +36,8 @@ public class NetworkAxis : NetworkObject
         _networkController = controller;
         _networkFollower.Init(index, group, controller);
         _randomOffset = Random.Range(50, 150);
+        
+        InitBaseState();
     }
 
     private void Update()
@@ -54,9 +62,21 @@ public class NetworkAxis : NetworkObject
         }
     }
 
+    private void InitBaseState()
+    {
+        transform.rotation = quaternion.Euler(0,0,0);
+        
+        var rand = Random.value;
+        
+        if (rand >= 0.5f)
+        {
+            _renderer.enabled = false;
+        }
+    }
+
     private void RunBaseState()
     {
-        transform.rotation = Quaternion.Euler(0,0,0);
+        
     }
 
     private void RunBuildState()
@@ -64,9 +84,22 @@ public class NetworkAxis : NetworkObject
         
     }
 
+    private void InitDropState()
+    {
+        _rotSpeed1 = _randomOffset / 10.0f;
+        _rotSpeed2 = _randomOffset / 5.0f;
+        
+        var randX = Random.Range(0, 360);
+        var randY = Random.Range(0, 360);
+        var randZ = Random.Range(0, 360);
+
+        transform.rotation = Quaternion.Euler(randX, randY, randZ);
+    }
+
     private void RunDropState()
     {
         Strobe(StrobeState.Randomized);
+        RandomRotate();
     }
 
     private void RunBreakState()
@@ -91,10 +124,6 @@ public class NetworkAxis : NetworkObject
 
     private void RandomRotate()
     {
-        var speed1 = _randomOffset / 10.0f;
-        var speed2 = _randomOffset / 5.0f;
-
-        transform.Rotate(Vector3.forward, Time.deltaTime * speed1);
-        transform.Rotate(Vector3.right, Time.deltaTime * speed2);
+        transform.Rotate(Time.deltaTime * _rotSpeed1, 0, Time.deltaTime * _rotSpeed2);
     }
 }

@@ -126,8 +126,11 @@ public class SpatialAnchorManager : MonoBehaviour
     {
       var attachment = effectPrefab.AddComponent<ARAnchorAttachment>();
       attachment.AttachedAnchor = anchor;
-      var cubeYOffset = _newObject.transform.localScale.y / 2;
-      attachment.Offset = Matrix4x4.Translate(new Vector3(0, cubeYOffset, 0));
+      
+      // designed to shift up to be level with ground
+      // not required for floating objects
+      // var cubeYOffset = _newObject.transform.localScale.y / 2;
+      // attachment.Offset = Matrix4x4.Translate(new Vector3(0, cubeYOffset, 0));
     }
 
     private void OnAnchorsRemoved(AnchorsArgs args)
