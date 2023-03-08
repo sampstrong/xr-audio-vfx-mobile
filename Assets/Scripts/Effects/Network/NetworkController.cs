@@ -62,8 +62,6 @@ public class NetworkController : MonoBehaviour
     private List<Vector3> _currentScales = new List<Vector3>();
     private List<Vector3> _oldScales = new List<Vector3>();
 
-    private int _beatCounter = 0;
-
     #endregion
 
     #region Enums
