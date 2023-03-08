@@ -4,19 +4,8 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Rendering;
 
-[RequireComponent(typeof(NetworkFollower))]
 public class NetworkNode : NetworkObject
 {
-    [SerializeField] private NetworkFollower _networkFollower;
-    
-    private NetworkGroup _networkGroup;
-    private NetworkController _networkController;
-    private int _index;
-
-    public void Start()
-    {
-        Assert.IsNotNull(_networkFollower, "Please Assign NetworkFollower component in the Inspector");
-    }
 
     public override void Init(int index, NetworkGroup group, NetworkController controller)
     {
@@ -26,12 +15,42 @@ public class NetworkNode : NetworkObject
         _networkFollower.Init(index, group, controller);
     }
 
-    public override void ControlVis(VisibilityState state)
+    protected override void InitBaseState()
+    {
+        ControlVis(VisibilityState.On);
+    }
+
+    protected override void RunBaseState()
     {
         
     }
 
-    public override void Strobe(StrobeState state)
+    protected override void InitBuildState()
+    {
+        ControlVis(VisibilityState.On);
+    }
+
+    protected override void RunBuildState()
+    {
+        
+    }
+
+    protected override void InitDropState()
+    {
+        
+    }
+
+    protected override void RunDropState()
+    {
+        
+    }
+
+    protected override void InitBreakState()
+    {
+        ControlVis(VisibilityState.On);
+    }
+
+    protected override void RunBreakState()
     {
         
     }

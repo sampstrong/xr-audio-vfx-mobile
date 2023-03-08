@@ -3,19 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-[RequireComponent(typeof(NetworkFollower))]
 public class NetworkConnector : NetworkObject
 {
-    [SerializeField] private List<Renderer> _renderers;
     [SerializeField] private Material _lineMaterial;
     [SerializeField] private float _distanceThreshold;
     [SerializeField] private float _minLineWidth;
     [SerializeField] private float _maxLineWidth;
 
-    private NetworkFollower _networkFollower;
-    private NetworkGroup _networkGroup;
-    private NetworkController _networkController;
-    private int _index;
 
     private List<LineRenderer> _lines = new List<LineRenderer>();
 
@@ -30,16 +24,6 @@ public class NetworkConnector : NetworkObject
         _networkController.VerticalOffsetEnded += ToggleVis;
         _networkGroup.AllObjectsCreated += InitLines;
         _networkGroup.AllObjectsCreated += DrawLines;
-        
-    }
-
-    public override void ControlVis(VisibilityState state)
-    {
-        
-    }
-
-    public override void Strobe(StrobeState state)
-    {
         
     }
 
@@ -103,5 +87,45 @@ public class NetworkConnector : NetworkObject
                 _lines[i].positionCount = 0;
             }
         }
+    }
+    
+    protected override void InitBaseState()
+    {
+        
+    }
+
+    protected override void RunBaseState()
+    {
+        
+    }
+
+    protected override void InitBuildState()
+    {
+        
+    }
+
+    protected override void RunBuildState()
+    {
+        
+    }
+
+    protected override void InitDropState()
+    {
+        
+    }
+
+    protected override void RunDropState()
+    {
+        
+    }
+
+    protected override void InitBreakState()
+    {
+        
+    }
+
+    protected override void RunBreakState()
+    {
+        
     }
 }

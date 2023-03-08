@@ -7,27 +7,22 @@ using UnityEngine.Assertions;
 using UnityEngine.Rendering;
 using Random = UnityEngine.Random;
 
-[RequireComponent(typeof(NetworkFollower))]
 public class NetworkAxis : NetworkObject
 {
-    [SerializeField] private NetworkFollower _networkFollower;
-    [SerializeField] private Renderer _renderer;
     [SerializeField] private float _strobeSpeed = 10.0f;
-    
-    private NetworkGroup _networkGroup;
-    private NetworkController _networkController;
-    private int _index;
-    
+
     private float _randomOffset;
     private float _rotSpeed1;
     private float _rotSpeed2;
-
-    public void Start()
+    
+    public enum StrobeState
     {
-        Assert.IsNotNull(_networkFollower, "Please Assign NetworkFollower component in the Inspector");
-        EffectManager.Instance.BaseStarted += InitBaseState;
-        EffectManager.Instance.DropStarted += InitDropState;
+        None = 0,
+        Synchronized = 1,
+        Randomized = 2,
     }
+
+    private StrobeState _strobeState { get; set; }
 
     public override void Init(int index, NetworkGroup group, NetworkController controller)
     {
@@ -38,57 +33,70 @@ public class NetworkAxis : NetworkObject
         _randomOffset = Random.Range(50, 150);
         
         InitBaseState();
+        
+        _rotSpeed1 = _randomOffset / 15.0f;
+        _rotSpeed2 = _randomOffset / 7.0f;
     }
 
-    private void Update()
-    {
-        switch (EffectManager.Instance.CurrentPreset)
-        {
-            case EffectManager.Preset.Base:
-                RunBaseState();
-                break;
-            case EffectManager.Preset.Build:
-                RunBuildState();
-                break;
-            case EffectManager.Preset.Drop:
-                RunDropState();
-                break;
-            case EffectManager.Preset.Break:
-                RunBreakState();
-                break;
-            default:
-                RunBaseState();
-                break;
-        }
-    }
-
-    private void InitBaseState()
+    protected override void InitBaseState()
     {
         transform.rotation = quaternion.Euler(0,0,0);
         
+        ControlVis(VisibilityState.Off);
+    }
+
+    protected override void RunBaseState()
+    {
+        
+    }
+
+    protected override void InitBuildState()
+    {
+        ControlVis(VisibilityState.On);
+        
+        if (transform.rotation.x == 0)
+            SetRandRot();
+    }
+
+    protected override void RunBuildState()
+    {
+        RandomRotate();
+    }
+
+    protected override void InitDropState()
+    {
+        transform.rotation = quaternion.Euler(0,0,0);
         var rand = Random.value;
         
         if (rand >= 0.5f)
         {
-            _renderer.enabled = false;
+            ControlVis(VisibilityState.Off);
         }
     }
 
-    private void RunBaseState()
+    protected override void RunDropState()
     {
-        
+        // Set to touch only
+        // Strobe(StrobeState.Randomized);
     }
 
-    private void RunBuildState()
+    protected override void InitBreakState()
     {
+        ControlVis(VisibilityState.On);
         
+        
+        
+        if (transform.rotation.x == 0)
+            SetRandRot();
     }
 
-    private void InitDropState()
+    protected override void RunBreakState()
     {
-        _rotSpeed1 = _randomOffset / 10.0f;
-        _rotSpeed2 = _randomOffset / 5.0f;
-        
+        RandomRotate();
+    }
+
+    private void SetRandRot()
+    {
         var randX = Random.Range(0, 360);
         var randY = Random.Range(0, 360);
         var randZ = Random.Range(0, 360);
@@ -96,30 +104,14 @@ public class NetworkAxis : NetworkObject
         transform.rotation = Quaternion.Euler(randX, randY, randZ);
     }
 
-    private void RunDropState()
-    {
-        Strobe(StrobeState.Randomized);
-        RandomRotate();
-    }
-
-    private void RunBreakState()
-    {
-        RandomRotate();
-    }
-
-    public override void ControlVis(VisibilityState state)
-    {
-        
-    }
-
-    public override void Strobe(StrobeState state)
+    private void Strobe(StrobeState state)
     {
         var triggerValue = Mathf.Sin((Time.time + _randomOffset) * _strobeSpeed);
 
         if (triggerValue >= -0.5)
-            _renderer.enabled = false;
+            ControlVis(VisibilityState.Off);
         else if (triggerValue <= 0.5)
-            _renderer.enabled = true;
+            ControlVis(VisibilityState.On);
     }
 
     private void RandomRotate()

@@ -129,6 +129,7 @@ public class SpatialAnchorManager : MonoBehaviour
       
       // designed to shift up to be level with ground
       // not required for floating objects
+      // uncomment if trying to place objects on ground
       // var cubeYOffset = _newObject.transform.localScale.y / 2;
       // attachment.Offset = Matrix4x4.Translate(new Vector3(0, cubeYOffset, 0));
     }

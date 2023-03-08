@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Niantic.ARDK.Utilities.Input.Legacy;
 using UnityEngine;
 using UnityEngine.Events;
@@ -25,7 +26,6 @@ public class NetworkController : MonoBehaviour
 
     #region Serialized Fields
 
-    // [SerializeField] private GameObject _pixelPrefab;
     
     [Header("Network Parameters")]
     [SerializeField] private int _band = 1;
@@ -53,7 +53,6 @@ public class NetworkController : MonoBehaviour
     
     #region Private Variables
 
-    //private List<Pixel> _pixels = new List<Pixel>();
     
     private List<Vector3> _newPositions = new List<Vector3>();
     private List<Vector3> _currentPositions = new List<Vector3>();
@@ -83,7 +82,8 @@ public class NetworkController : MonoBehaviour
     void Start()
     {
         Init();
-        VFXEventManager.onBandTriggered += ReactToBand;
+        VFXEventManager.onHalfBar += FilterHalfBarTrigger;
+        VFXEventManager.onBar += FilterBarTrigger;
     }
 
     private void Init()
@@ -103,7 +103,6 @@ public class NetworkController : MonoBehaviour
         }
 
         _animationState = AnimationState.None;
-        
     }
 
     private void AddToLists(Vector3 pos, Vector3 scale)
@@ -158,26 +157,23 @@ public class NetworkController : MonoBehaviour
 
         return new Vector3(x, y, z);
     }
-    
-    private void ReactToBand(int band)
+
+    private void FilterHalfBarTrigger(int band)
     {
         if (band != _band) return;
-        _beatCounter += 1;
-
-        if (_beatCounter == 2 && _animationState == AnimationState.None)
-        {
+        if (_animationState == AnimationState.None)
             StartVerticalShift();
-        }
-        else if (_beatCounter >= 4 && _animationState == AnimationState.None)
-        {
+    }
+
+    private void FilterBarTrigger(int band)
+    {
+        if (band != _band) return;
+        if (_animationState == AnimationState.None)
             ChangePosScale();
-            _beatCounter = 0;
-        }
     }
 
     private void ChangePosScale()
     {
-        Debug.Log("New Pos & Scale");
         SetNewRandomPosScale();
         StartCoroutine(Reposition(_oldPositions, _newPositions, _transitionDuration));
         StartCoroutine(Rescale(_oldScales, _newScales, _transitionDuration));
@@ -185,8 +181,9 @@ public class NetworkController : MonoBehaviour
     
     private void StartVerticalShift()
     {
-        Debug.Log("Vertical Shift");
-        
+        if (EffectManager.Instance.CurrentPreset != EffectManager.Preset.Drop)
+            return;
+
         List<Vector3> randYPositions = new List<Vector3>();
         for (int i = 0; i < _networkSize; i++)
         {
@@ -198,6 +195,13 @@ public class NetworkController : MonoBehaviour
 
         StartCoroutine(ShiftVertically(_newPositions, randYPositions, _transitionDuration));
     }
+
+    private void Test()
+    {
+
+        var callback = StartCoroutine(Reposition(_oldPositions, _newPositions, 1.0f));
+    }
+    
 
     #region Animation Coroutines
 
@@ -269,7 +273,6 @@ public class NetworkController : MonoBehaviour
             for (int i = 0; i < _networkSize; i++)
             {
                 UpdateCurrentPosition(i, oldPositions[i]);
-                Debug.Log("Back to OG Pos");
             }
 
             _animationState = AnimationState.None;

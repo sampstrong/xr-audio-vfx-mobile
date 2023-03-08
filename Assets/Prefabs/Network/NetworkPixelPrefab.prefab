@@ -125,3 +125,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _networkFollower: {fileID: 1850327832}
+  _renderers:
+  - {fileID: 3090928222860491497}
+  _strobeSpeed: 50
+  _band: 1
+  _strobeDuration: 0.5

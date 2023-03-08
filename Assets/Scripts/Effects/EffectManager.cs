@@ -9,10 +9,7 @@ public class EffectManager : Singleton<EffectManager>
 {
     public Preset CurrentPreset => _preset;
 
-    public event Action BaseStarted;
-    public event Action BuildStarted;
-    public event Action DropStarted;
-    public event Action BreakStarted;
+
 
     [SerializeField] private List<GameObject> _effects;
     [SerializeField] private SpatialAnchorManager _anchorManager;
@@ -49,13 +46,21 @@ public class EffectManager : Singleton<EffectManager>
     {
         if (PlatformAgnosticInput.touchCount > 0)
         {
-            DropStarted?.Invoke();
-            _preset = Preset.Drop;
+            if (_preset != Preset.Build)
+            {
+                // VFXEventManager.InvokeDropStartedEvent();
+                // _preset = Preset.Drop;
+                VFXEventManager.InvokeBuildStartedEvent();
+                _preset = Preset.Build;
+            }
         }
         else
         {
-            BaseStarted?.Invoke();
-            _preset = Preset.Base;
+            if (_preset != Preset.Drop)
+            {
+                VFXEventManager.InvokeDropStartedEvent();
+                _preset = Preset.Drop;
+            }
         }
     }
 }

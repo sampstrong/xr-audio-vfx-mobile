@@ -58,6 +58,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59f827de03d9746358336d5f3b5a0cec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _networkFollower: {fileID: 5170290076209133173}
   _renderers: []
   _lineMaterial: {fileID: 2100000, guid: b27cf4eef828a406d8e5946a8d2c5789, type: 2}
   _distanceThreshold: 2
