@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Niantic.ARDK.Utilities.Input.Legacy;
 using UnityEngine;
 using UnityEngine.Events;
 using Random = UnityEngine.Random;
@@ -13,7 +14,6 @@ public class NetworkController : MonoBehaviour
     public List<Vector3> CurrentScales => _currentScales;
     public int NetworkSize => _networkSize;
     public AnimationState CurrentAnimationState => _animationState;
-    public Preset CurrentPreset => _preset;
 
     public event Action<int, Vector3> PositionUpdated;
     public event Action<int, Vector3> ScaleUpdated;
@@ -69,16 +69,6 @@ public class NetworkController : MonoBehaviour
 
     #region Enums
 
-    public enum Preset
-    {
-        Base = 0,
-        Build = 1,
-        Drop = 2,
-        Break = 3,
-    }
-
-    private Preset _preset;
-    
     public enum AnimationState
     {
         None = 0,
@@ -89,7 +79,6 @@ public class NetworkController : MonoBehaviour
     private AnimationState _animationState;
 
     #endregion
-    
     
     void Start()
     {
@@ -114,6 +103,7 @@ public class NetworkController : MonoBehaviour
         }
 
         _animationState = AnimationState.None;
+        
     }
 
     private void AddToLists(Vector3 pos, Vector3 scale)

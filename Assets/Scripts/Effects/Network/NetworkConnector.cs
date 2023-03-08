@@ -79,6 +79,8 @@ public class NetworkConnector : NetworkObject
 
     private void DrawLines()
     {
+        if (_index == 0)
+            Debug.Log($"Connector Pos 0: {transform.position}");
         // sets up line renderers to connect to other nearby nodes when they are closer than the threshold
         for (int i = 0; i < _networkGroup.NetworkObjects.Count; i++)
         {

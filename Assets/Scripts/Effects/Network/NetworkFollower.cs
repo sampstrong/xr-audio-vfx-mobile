@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 public class NetworkFollower : MonoBehaviour
@@ -34,6 +35,7 @@ public class NetworkFollower : MonoBehaviour
         if (index != _index) 
             return;
         transform.position = pos; // local position?
+        Debug.Log($"Current Pos Index 0: {_networkController.CurrentPositions[0]}");
     }
 
     private void UpdateScale(int index, Vector3 scale)
