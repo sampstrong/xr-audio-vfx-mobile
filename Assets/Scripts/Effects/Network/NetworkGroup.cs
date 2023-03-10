@@ -30,7 +30,7 @@ public class NetworkGroup : MonoBehaviour
         
         for (int i = 0; i < _networkController.NetworkSize; i++)
         {
-            var newObj = Instantiate(_objectPrefab, _networkController.CurrentPositions[i], Quaternion.identity, transform);
+            var newObj = Instantiate(_objectPrefab, _networkController.CurrentPositions[i], _networkController.transform.rotation, transform);
             // var newNetworkObj = newObj.GetComponent(typeof(NetworkObject)) as NetworkObject;
             var newNetworkObj = newObj.GetComponent<NetworkObject>();
 

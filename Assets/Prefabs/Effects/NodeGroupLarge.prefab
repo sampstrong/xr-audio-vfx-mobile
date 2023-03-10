@@ -47,12 +47,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _nodePrefab: {fileID: 7439328537995353995, guid: f46108f98a486446cad02ad5fc405a78,
     type: 3}
-  _numberOfNodes: 30
+  _numberOfNodes: 50
   _minScale: 0.08
   _maxScale: 0.4
   _speed: 0.8
   _lineMaterial: {fileID: 2100000, guid: 8f96ebf196f4c439f90fb7c2c3bb3e81, type: 2}
-  _distanceThreshold: 3
+  _distanceThreshold: 2
   _maxLineWidth: 30
   _minLineWidth: 5
   _xRange: 4

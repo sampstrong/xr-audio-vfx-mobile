@@ -7,12 +7,10 @@ using UnityEngine.Events;
 public class BandTrigger : MonoBehaviour
 {
     public Band[] Bands { get => _bands; }
-    
-    // events for going above and below threshold
-    // public UnityEvent[] onBandTriggered = new UnityEvent[8];
-    // public UnityEvent[] onBandReleased = new UnityEvent[8];
 
-    [SerializeField] private float _triggerThreshold = 0.5f;
+    [SerializeField] private float _sensitivity = 0.5f;
+
+    private float _triggerThreshold = 0.5f;
     
     private Band[] _bands = new Band[8];
 
@@ -25,6 +23,8 @@ public class BandTrigger : MonoBehaviour
         {
             _bands[i] = new Band(0, false);
         }
+        
+        SetSensitivity(_sensitivity);
     }
     
     /// <summary>
@@ -35,7 +35,6 @@ public class BandTrigger : MonoBehaviour
         for (int i = 0; i < _bands.Length; i++)
         {
             _bands[i].Intensity = AudioSpectrumReader.audioBandIntensityBuffer[i];
-            
         }
         
         GetBandTrigger();
@@ -61,6 +60,13 @@ public class BandTrigger : MonoBehaviour
                 VFXEventManager.InvokeBandReleasedEvent(i);
             }
         }
+    }
+
+    public void SetSensitivity(float sensitivity)
+    {
+        _triggerThreshold = 0.01f + (sensitivity * 0.99f);
+        
+        Debug.Log($"Trigger Threshold: {_triggerThreshold}");
     }
 }
 

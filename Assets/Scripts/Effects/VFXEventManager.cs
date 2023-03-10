@@ -57,15 +57,28 @@ public static class VFXEventManager
     private static void CountBeats(int band)
     {
         beatCounter[band] += 1;
+        
+        if (band == 1)
+        {
+            Debug.Log($"Beat count: {beatCounter[band]}");
+        }
 
         if (beatCounter[band] == 2)
         {
             onHalfBar?.Invoke(band);
+            if (band == 1)
+            {
+                Debug.Log("On Half Bar Invoked");
+            }
         }
         else if (beatCounter[band] == 4)
         {
             onBar?.Invoke(band);
             beatCounter[band] = 0;
+            if (band == 1)
+            {
+                Debug.Log("On Bar Invoked");
+            }
         }
         else if (beatCounter[band] > 4)
         {

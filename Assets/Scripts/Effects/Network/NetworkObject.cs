@@ -33,7 +33,7 @@ public abstract class NetworkObject : MonoBehaviour
 
     protected virtual void Update()
     {
-        switch (EffectManager.Instance.CurrentPreset)
+        switch (ServiceLocator.Instance.EffectManager.CurrentPreset)
         {
             case EffectManager.Preset.Base:
                 RunBaseState();

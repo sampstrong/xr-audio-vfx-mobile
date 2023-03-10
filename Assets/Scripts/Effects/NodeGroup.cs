@@ -104,11 +104,11 @@ public class NodeGroup : MonoBehaviour
             // Initialize Lines
             for (int j = 0; j < _numberOfNodes; j++)
             {
-                GameObject child = Instantiate(new GameObject($"Line {j}"), node.obj.transform);
-                LineRenderer line = child.AddComponent<LineRenderer>();
+                LineRenderer line = new GameObject($"Line {i}").AddComponent<LineRenderer>();
+                line.transform.parent = node.obj.transform;
                 line.material = _lineMaterial;
                 line.positionCount = 0;
-                node.children.Add(child);
+                node.children.Add(line.gameObject);
                 node.lines.Add(line);
             }
 

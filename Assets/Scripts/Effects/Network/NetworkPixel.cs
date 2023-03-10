@@ -18,8 +18,6 @@ public class NetworkPixel : NetworkObject
         _networkGroup = group;
         _networkController = controller;
         _networkFollower.Init(index, group, controller);
-        
-        
     }
 
     protected override void InitBaseState()

@@ -179,25 +179,20 @@ public class NetworkController : MonoBehaviour
     
     private void StartVerticalShift()
     {
-        if (EffectManager.Instance.CurrentPreset != EffectManager.Preset.Drop)
-            return;
-
-        List<Vector3> randYPositions = new List<Vector3>();
-        for (int i = 0; i < _networkSize; i++)
+        if (ServiceLocator.Instance.EffectManager.CurrentPreset is EffectManager.Preset.Drop
+            or EffectManager.Preset.Base)
         {
-            var newPos = GetRandomV3(0, 0, _yPosRange.min, _yPosRange.max, 0, 0);
-            var newLocalPos = transform.TransformPoint(newPos);
+            List<Vector3> randYPositions = new List<Vector3>();
+            for (int i = 0; i < _networkSize; i++)
+            {
+                var newPos = GetRandomV3(0, 0, _yPosRange.min, _yPosRange.max, 0, 0);
+                var newLocalPos = transform.TransformPoint(newPos);
                 
-            randYPositions.Add(new Vector3(_currentPositions[i].x, newLocalPos.y, _currentPositions[i].z));
+                randYPositions.Add(new Vector3(_currentPositions[i].x, newLocalPos.y, _currentPositions[i].z));
+            }
+
+            StartCoroutine(ShiftVertically(_newPositions, randYPositions, _transitionDuration));
         }
-
-        StartCoroutine(ShiftVertically(_newPositions, randYPositions, _transitionDuration));
-    }
-
-    private void Test()
-    {
-
-        var callback = StartCoroutine(Reposition(_oldPositions, _newPositions, 1.0f));
     }
     
 

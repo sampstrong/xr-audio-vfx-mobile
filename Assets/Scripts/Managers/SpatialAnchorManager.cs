@@ -11,9 +11,12 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class SpatialAnchorManager : MonoBehaviour
-  {
+{
+    public GameObject CurrentObject => _currentObject;
+
     public Camera Camera;
-    //public GameObject PrefabToPlace;
+
+    public event Action<GameObject> CurrentObjectSet;
     
     [SerializeField] private float _yOffset = 5;
     [SerializeField] private float _zOffset = 1;
@@ -61,9 +64,13 @@ public class SpatialAnchorManager : MonoBehaviour
     public void PlaceAnchor(GameObject objToPlace)
     {
       _newObject = objToPlace;
+
+      var cam = Camera.transform;
+
+      var horizontalPos = cam.forward * _zOffset;
       
-      var position = Camera.transform.position + new Vector3(0, _yOffset, _zOffset);
-      var rotation = Camera.transform.rotation;
+      var position = cam.position + new Vector3(horizontalPos.x, _yOffset, horizontalPos.z);
+      var rotation = Quaternion.Euler(new Vector3(0, cam.rotation.eulerAngles.y, 0));
       
       var anchor = _session.AddAnchor(Matrix4x4.TRS(position, rotation, Vector3.one));
       _addedAnchors.Add(anchor.Identifier, anchor);
@@ -119,6 +126,8 @@ public class SpatialAnchorManager : MonoBehaviour
         // Keep track of the anchor objects
         _placedObjects.Add(anchor.Identifier, effect);
         _currentObject = effect;
+        
+        CurrentObjectSet?.Invoke(_currentObject);
       }
     }
 

@@ -37,8 +37,6 @@ public class TouchAdjustmentHelper : MonoBehaviour, IAdjustable
 
     void Update()
     {
-        if (!_adjustmentEnabled && !_recenterEnabled) return;
-        
         if (_adjustmentEnabled)
         {
             switch (PlatformAgnosticInput.touchCount)
