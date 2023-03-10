@@ -26,10 +26,6 @@ public static class VFXEventManager
     public static void InvokeBandTriggeredEvent(int band)
     {
         onBandTriggered?.Invoke(band);
-        
-        if (band == 1)
-            Debug.Log("Band 1 Triggered");
-        
         CountBeats(band);
     }
     

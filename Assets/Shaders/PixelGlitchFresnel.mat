@@ -34,7 +34,7 @@ Material:
     - _FresnelIntensity: 1.14
     - _FresnelPower: 1.37
     - _FresnelRamp: 2.86
-    - _OpacityMultiplier: 0.8351324
+    - _OpacityMultiplier: 0.10555291
     m_Colors:
     - _FresnelColor: {r: 1.4980392, g: 0.4, b: 1.4117647, a: 1}
     - _WireframeColor: {r: 0, g: 1.2904632, b: 1.3041189, a: 1}

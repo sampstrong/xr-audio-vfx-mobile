@@ -10,6 +10,7 @@ using UnityEngine.UIElements;
 public class Page : MonoBehaviour
 {
     public bool exitOnNewPagePush = false;
+    public bool isOverlay = false;
 
     [SerializeField] private float _animationSpeed = 1.0f;
     [SerializeField] private AudioClip _entryClip;

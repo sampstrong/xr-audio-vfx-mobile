@@ -3,18 +3,21 @@ using System.Collections;
 using System.Collections.Generic;
 using Niantic.ARDK.Utilities.Input.Legacy;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.VFX;
 
 public class EffectManager : Singleton<EffectManager>
 {
     public Preset CurrentPreset => _preset;
 
-
-
     [SerializeField] private List<GameObject> _effects;
     [SerializeField] private SpatialAnchorManager _anchorManager;
 
     private GameObject _currentEffect;
+    private TouchAdjustmentHelper _currentTouchHelper;
+
+    private Vector2 _touchStartPos;
+    private Vector2 _touchEndPos;
     
     public enum Preset
     {
@@ -34,6 +37,7 @@ public class EffectManager : Singleton<EffectManager>
     public void SetCurrentEffect(int index)
     {
         _currentEffect = _effects[index];
+        _currentTouchHelper = _currentEffect.GetComponentInChildren<TouchAdjustmentHelper>();
         Debug.Log($"Current Effect Set To: {_effects[index].name}");
     }
 
@@ -41,26 +45,46 @@ public class EffectManager : Singleton<EffectManager>
     {
         _anchorManager.PlaceAnchor(_currentEffect);
     }
-    
-    private void Update()
+
+    public void SetPreset(int presetIndex)
     {
-        if (PlatformAgnosticInput.touchCount > 0)
+        if (_currentEffect == null) return;
+        
+        _preset = (Preset)presetIndex;
+        
+        switch (_preset)
         {
-            if (_preset != Preset.Build)
-            {
-                // VFXEventManager.InvokeDropStartedEvent();
-                // _preset = Preset.Drop;
+            case Preset.Base:
+                VFXEventManager.InvokeBaseStartedEvent();
+                break;
+            case Preset.Build:
                 VFXEventManager.InvokeBuildStartedEvent();
-                _preset = Preset.Build;
-            }
-        }
-        else
-        {
-            if (_preset != Preset.Drop)
-            {
+                break;
+            case Preset.Drop:
                 VFXEventManager.InvokeDropStartedEvent();
-                _preset = Preset.Drop;
-            }
+                break;
+            case Preset.Break:
+                VFXEventManager.InvokeBreakStartedEvent();
+                break;
         }
     }
+
+    public void AdjustSensitivity(float value)
+    {
+        
+    }
+    
+    public void ToggleAdjustment()
+    {
+        Assert.IsNotNull(_currentTouchHelper, "There is no TouchAdjustmentHelper attached to the current effect");
+        _currentTouchHelper.ToggleAdjustmentEnabled();
+    }
+
+    public void ToggleRecenter()
+    {
+        Assert.IsNotNull(_currentTouchHelper, "There is no TouchAdjustmentHelper attached to the current effect");
+        _currentTouchHelper.ToggleRecenterEnabled();
+    }
+
+
 }

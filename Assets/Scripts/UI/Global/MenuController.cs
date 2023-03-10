@@ -39,6 +39,7 @@ public class MenuController : MonoBehaviour
             if (page == _pageStack.Peek())
             {
                 PopPage();
+
                 return;
             }
         }
@@ -71,6 +72,15 @@ public class MenuController : MonoBehaviour
             page.Exit(true);
 
             Page newCurrentPage = _pageStack.Peek();
+
+            // added logic to account for overlays which we do not want to return to
+            // only works for a set of two overlays opened in sequence
+            if (newCurrentPage.isOverlay)
+            {
+                _pageStack.Pop();
+                return;
+            }
+            
             if (newCurrentPage.exitOnNewPagePush)
             {
                 newCurrentPage.Enter(false);

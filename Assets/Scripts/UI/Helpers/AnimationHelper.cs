@@ -106,20 +106,22 @@ public class AnimationHelper
         Vector2 endPosition;
         switch (direction)
         {
+            // needed to add an extra 100 pixels to screen here - not sure why
+            
             case Direction.Up:
-                endPosition = new Vector2(0, Screen.height);
+                endPosition = new Vector2(0, Screen.height + 100);
                 break;
             case Direction.Right:
-                endPosition = new Vector2(Screen.width, 0);
+                endPosition = new Vector2(Screen.width + 100, 0);
                 break;
             case Direction.Down:
-                endPosition = new Vector2(0, -Screen.height);
+                endPosition = new Vector2(0, -Screen.height - 100);
                 break;
             case Direction.Left:
-                endPosition = new Vector2(-Screen.width, 0);
+                endPosition = new Vector2(-Screen.width - 100, 0);
                 break;
             default:
-                endPosition = new Vector2(0, Screen.height);
+                endPosition = new Vector2(0, Screen.height + 100);
                 break;
         }
 

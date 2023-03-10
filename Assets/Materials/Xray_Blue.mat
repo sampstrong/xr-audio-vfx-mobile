@@ -21,7 +21,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Xray_Blue
-  m_Shader: {fileID: -6465566751694194690, guid: a586bcc99b9ae4461b185ff9bfd5ebad,
+  m_Shader: {fileID: -6465566751694194690, guid: baf85602917874267a387f4ef565b2e5,
     type: 3}
   m_ValidKeywords: []
   m_InvalidKeywords: []
@@ -48,9 +48,11 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _Density: 10
     - _Fresnel_Power: 1
     - _QueueControl: 0
     - _QueueOffset: 0
+    - _Speed: 0
     m_Colors:
     - _Base_Color: {r: 0.24038802, g: 0.698113, b: 0.6981132, a: 0}
     - _Emissive_Color: {r: 0.40896067, g: 1.8113624, b: 2.297397, a: 0}

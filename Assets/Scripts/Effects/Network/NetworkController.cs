@@ -291,5 +291,14 @@ public class NetworkController : MonoBehaviour
         _currentScales[index] = scale;
         ScaleUpdated?.Invoke(index, scale);
     }
+
+    public void TriggerPosUpdated()
+    {
+        for (int i = 0; i < _currentPositions.Count; i++)
+        {
+            PositionUpdated?.Invoke(i, _currentPositions[i]);
+        }
+        
+    }
     
 }

@@ -48,10 +48,12 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Fresnel_Power: 1
+    - _Density: 31
+    - _Fresnel_Power: 1.88
     - _QueueControl: 0
     - _QueueOffset: 0
+    - _Speed: 3.52
     m_Colors:
     - _Base_Color: {r: 1, g: 1, b: 1, a: 0}
-    - _Emissive_Color: {r: 3.482202, g: 3.482202, b: 3.482202, a: 0}
+    - _Emissive_Color: {r: 10.432951, g: 10.432951, b: 10.432951, a: 0}
   m_BuildTextureStacks: []
