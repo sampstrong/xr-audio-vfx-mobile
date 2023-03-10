@@ -5,6 +5,7 @@ using UnityEngine.Assertions;
 public class EffectManager : MonoBehaviour
 {
     public Preset CurrentPreset => _preset;
+    public bool AdjustmentEnabled => _adjustmentEnabled;
 
     [SerializeField] private List<GameObject> _effects;
     [SerializeField] private SpatialAnchorManager _anchorManager;
@@ -17,6 +18,8 @@ public class EffectManager : MonoBehaviour
 
     private Vector2 _touchStartPos;
     private Vector2 _touchEndPos;
+
+    private bool _adjustmentEnabled = false;
     
     public enum Preset
     {
@@ -81,18 +84,19 @@ public class EffectManager : MonoBehaviour
         _currentShaderController.Sensitivity = value * 100;
     }
     
-    public void ToggleAdjustment()
+    public void ToggleAdjustment(bool toggleValue)
     {
         Assert.IsNotNull(_placedEffect, "There is no effect placed in the scene");
         Assert.IsNotNull(_currentTouchHelper, "There is no TouchAdjustmentHelper attached to the placed effect");
-        _currentTouchHelper.ToggleAdjustmentEnabled();
+        _currentTouchHelper.ToggleAdjustmentEnabled(toggleValue);
+        _adjustmentEnabled = toggleValue;
     }
 
-    public void ToggleRecenter()
+    public void ToggleRecenter(bool toggleValue)
     {
         Assert.IsNotNull(_placedEffect, "There is no effect placed in the scene");
         Assert.IsNotNull(_currentTouchHelper, "There is no TouchAdjustmentHelper attached to the placed effect");
-        _currentTouchHelper.ToggleRecenterEnabled();
+        _currentTouchHelper.ToggleRecenterEnabled(toggleValue);
     }
 
 

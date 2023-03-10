@@ -23,6 +23,10 @@ public abstract class NetworkObject : MonoBehaviour
     protected virtual void Start()
     {
         Assert.IsNotNull(_networkFollower, "Please Assign NetworkFollower component in the Inspector");
+        
+        // should probably rework this to have one event that passes preset as a parameter
+        // then this can fire one method with a switch statement that fires the methods below
+        // can fire separate method for control vis
         VFXEventManager.BaseStarted += InitBaseState;
         VFXEventManager.BuildStarted += InitBuildState;
         VFXEventManager.DropStarted += InitDropState;

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Niantic.ARDK.Utilities.Input.Legacy;
 using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -37,6 +38,62 @@ public class NetworkAxis : NetworkObject
         _rotSpeed1 = _randomOffset / 15.0f;
         _rotSpeed2 = _randomOffset / 7.0f;
     }
+    
+    protected override void Update()
+    {
+        base.Update();
+
+        if (ServiceLocator.Instance.EffectManager.AdjustmentEnabled) return;
+        
+        if (PlatformAgnosticInput.touchCount < 0) return;
+        var touch = PlatformAgnosticInput.GetTouch(0);
+
+        var noTouchZone = Screen.height / 8;
+
+        if (touch.position.y < noTouchZone || touch.position.y > Screen.height - noTouchZone)
+            return;
+        
+
+        switch (PlatformAgnosticInput.touchCount)
+        {
+            case 0:
+                break;
+            case 1:
+                Strobe(StrobeState.Randomized);
+                break;
+            case 2:
+                Strobe(StrobeState.Synchronized);
+                break;
+            default:
+                break;
+        }
+        
+        // return to previous state
+        if (touch.phase == TouchPhase.Ended)
+        {
+            switch (ServiceLocator.Instance.EffectManager.CurrentPreset)
+            {
+                case EffectManager.Preset.Base:
+                    ControlVis(VisibilityState.Off);
+                    break;
+                case EffectManager.Preset.Build:
+                    ControlVis(VisibilityState.On);
+                    break;
+                case EffectManager.Preset.Drop:
+                    ControlVis(VisibilityState.On);
+                    var rand = Random.value;
+        
+                    if (rand >= 0.5f)
+                    {
+                        ControlVis(VisibilityState.Off);
+                    }
+                    break;
+                case EffectManager.Preset.Break:
+                    ControlVis(VisibilityState.On);
+                    break;
+            }
+        }
+    }
 
     protected override void InitBaseState()
     {
@@ -44,6 +101,7 @@ public class NetworkAxis : NetworkObject
         
         ControlVis(VisibilityState.Off);
     }
+    
 
     protected override void RunBaseState()
     {
@@ -65,6 +123,8 @@ public class NetworkAxis : NetworkObject
 
     protected override void InitDropState()
     {
+        ControlVis(VisibilityState.On);
+        
         transform.rotation = quaternion.Euler(0,0,0);
         var rand = Random.value;
         
@@ -106,7 +166,14 @@ public class NetworkAxis : NetworkObject
 
     private void Strobe(StrobeState state)
     {
-        var triggerValue = Mathf.Sin((Time.time + _randomOffset) * _strobeSpeed);
+        float offset;
+
+        if (state == StrobeState.Randomized)
+            offset = _randomOffset;
+        else
+            offset = 0;
+
+        var triggerValue = Mathf.Sin((Time.time + offset) * _strobeSpeed);
 
         if (triggerValue >= -0.5)
             ControlVis(VisibilityState.Off);

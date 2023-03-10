@@ -51,7 +51,7 @@ public class NetworkPixel : NetworkObject
 
     protected override void RunDropState()
     {
-        ControlVis(VisibilityState.On);
+        
     }
 
     protected override void InitBreakState()

@@ -123,7 +123,8 @@ public class TouchAdjustmentHelper : MonoBehaviour, IAdjustable
         var newPos = _objStartPos + new Vector3(0, 0, zOffset);
         gameObject.transform.position = newPos;
     }
-
+    
+    // need to rework to trigger new anchor placement on double tap
     public void Recenter()
     {
         Debug.Log("Recenter Triggered");
@@ -144,13 +145,13 @@ public class TouchAdjustmentHelper : MonoBehaviour, IAdjustable
         _objStartPos = transform.position; 
     }
 
-    public void ToggleAdjustmentEnabled()
+    public void ToggleAdjustmentEnabled(bool toggleValue)
     {
-        _adjustmentEnabled = !_adjustmentEnabled;
+        _adjustmentEnabled = toggleValue;
     }
 
-    public void ToggleRecenterEnabled()
+    public void ToggleRecenterEnabled(bool toggleValue)
     {
-        _recenterEnabled = !_recenterEnabled;
+        _recenterEnabled = toggleValue;
     }
 }
