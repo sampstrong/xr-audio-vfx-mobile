@@ -55,7 +55,7 @@ public class SpatialAnchorManager : MonoBehaviour
         return;
 
       // Display the number of anchors
-      AnchorDisplayText.text = "Anchors: " + currentFrame.Anchors.Count;
+      // AnchorDisplayText.text = "Anchors: " + currentFrame.Anchors.Count;
     }
 
     /// <summary>

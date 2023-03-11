@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class TouchAdjustmentHelper : MonoBehaviour, IAdjustable
 {
+    private Camera _cam;
+    
     private enum TouchDirection
     {
         X = 0,
@@ -33,6 +35,8 @@ public class TouchAdjustmentHelper : MonoBehaviour, IAdjustable
         OffsetX = AdjustXPos;
         OffsetY = AdjustYPos;
         OffsetZ = AdjustZPos;
+
+        _cam = ServiceLocator.Instance.ARCamera;
     }
 
     void Update()
@@ -108,19 +112,19 @@ public class TouchAdjustmentHelper : MonoBehaviour, IAdjustable
 
     public void AdjustXPos(float xOffset)
     {
-        var newPos = _objStartPos + new Vector3(xOffset, 0, 0);
+        var newPos = _objStartPos + _cam.transform.right * xOffset;
         gameObject.transform.position = newPos;
     }
 
     public void AdjustYPos(float yOffset)
     {
-        var newPos = _objStartPos + new Vector3(0, yOffset, 0);
+        var newPos = _objStartPos + _cam.transform.up * yOffset;
         gameObject.transform.position = newPos;
     }
 
     public void AdjustZPos(float zOffset)
     {
-        var newPos = _objStartPos + new Vector3(0, 0, zOffset);
+        var newPos = _objStartPos + _cam.transform.forward * zOffset;
         gameObject.transform.position = newPos;
     }
     

@@ -14,6 +14,8 @@ public class AudioShaderController : AudioController
     [SerializeField] private string _shaderParameter = "_OpacityMultiplier";
     
     [SerializeField] private float _sensitivity = 100.0f;
+    [SerializeField] private float _min = 0.1f;
+    [SerializeField] private float _max = 1.0f;
 
     
     protected override void Update()
@@ -22,7 +24,7 @@ public class AudioShaderController : AudioController
 
         var intensity = Mathf.Clamp(_audioBandIntensityBuffer * _sensitivity, 0.0f, 1.0f);
 
-        var controlValue = GetControlValue(intensity, 0.1f, 1.0f);
+        var controlValue = GetControlValue(intensity, _min, _max);
 
         _pixelMat.SetFloat(_shaderParameter, controlValue);
     }
