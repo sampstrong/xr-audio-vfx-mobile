@@ -21,7 +21,7 @@ public class SpatialAnchorManager : MonoBehaviour
     [SerializeField] private float _yOffset = 5;
     [SerializeField] private float _zOffset = 1;
     
-    public Text AnchorDisplayText;
+    //public Text AnchorDisplayText;
 
     private GameObject _newObject;
     private GameObject _currentObject;

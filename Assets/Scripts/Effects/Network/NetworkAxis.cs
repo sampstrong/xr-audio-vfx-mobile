@@ -45,14 +45,13 @@ public class NetworkAxis : NetworkObject
 
         if (ServiceLocator.Instance.EffectManager.AdjustmentEnabled) return;
         
-        if (PlatformAgnosticInput.touchCount < 0) return;
+        
+        if (PlatformAgnosticInput.touchCount <= 0) return;
         var touch = PlatformAgnosticInput.GetTouch(0);
-
+        
         var noTouchZone = Screen.height / 8;
-
         if (touch.position.y < noTouchZone || touch.position.y > Screen.height - noTouchZone)
             return;
-        
 
         switch (PlatformAgnosticInput.touchCount)
         {
@@ -67,7 +66,7 @@ public class NetworkAxis : NetworkObject
             default:
                 break;
         }
-        
+
         // return to previous state
         if (touch.phase == TouchPhase.Ended)
         {
