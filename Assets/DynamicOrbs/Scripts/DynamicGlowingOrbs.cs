@@ -3,7 +3,7 @@ using Sirenix.OdinInspector;
 using Sirenix.Utilities;
 using UnityEngine;
 
-[ExecuteInEditMode]
+// [ExecuteInEditMode]
 public class DynamicGlowingOrbs : MonoBehaviour
 {
     [SerializeField] private Material _material;
@@ -20,8 +20,9 @@ public class DynamicGlowingOrbs : MonoBehaviour
     private List<float> _sizes = new List<float>();
     private List<Matrix4x4> _rotationMatrices = new List<Matrix4x4>();
 
-    private List<Orb> _orbsInPlay = new List<Orb>();
-    private List<Orb> _orbsOnHold = new List<Orb>();
+    private List<Orb> _enabledOrbs = new List<Orb>();
+    private List<Orb> _disabledOrbs = new List<Orb>();
+    private List<Color> _frequencyColors = new List<Color>();
     
     
     void Start()
@@ -38,6 +39,8 @@ public class DynamicGlowingOrbs : MonoBehaviour
 
     private void InitLists()
     {
+        ResetOrbs();
+        
         for (int i = 0; i < _objects.Count; i++)
         {
             var collider = _objects[i].GetComponent<SphereCollider>();
@@ -55,12 +58,51 @@ public class DynamicGlowingOrbs : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Launch the next available orb
+    /// </summary>
     [Button]
-    private void LaunchOrb()
+    private void LaunchOrb(int band)
     {
+        var freq = new OrbFrequency(band, _colors[band]);
         
+        if (_disabledOrbs.Count > 0)
+        {
+            var orb = _disabledOrbs[0];
+            _disabledOrbs.Remove(orb);
+            _enabledOrbs.Add(orb);
+            orb.InitOrb(HelperMethods.GetRandomVec3(), HelperMethods.GetRandomVec3(), freq);
+        }
+        else
+        {
+            // add a pop in / pop out animation here
+            var orb = _enabledOrbs[0];
+            _enabledOrbs.Remove(orb);
+            _enabledOrbs.Add(orb);
+            orb.InitOrb(HelperMethods.GetRandomVec3(), HelperMethods.GetRandomVec3(), freq);
+        }
     }
 
+    /// <summary>
+    /// Disable all orbs and make them ready to launch
+    /// </summary>
+    [Button]
+    private void ResetOrbs()
+    {
+        _frequencyColors.AddRange(_colors);
+        _disabledOrbs.AddRange(_objects);
+        _enabledOrbs.Clear();
+        
+        foreach (var orb in _objects)
+        {
+            orb.DisableOrb();
+        }
+    }
+
+    /// <summary>
+    /// Passes each orbs transform and color into the shader
+    /// Raymarched objects in shader will then track with objects in unity
+    /// </summary>
     private void UpdateShaderUniforms()
     {
         for (int i = 0; i < _objects.Count; i++)
@@ -73,12 +115,15 @@ public class DynamicGlowingOrbs : MonoBehaviour
 
             var rot = _objects[i].transform.rotation;
             _rotationMatrices[i] = Matrix4x4.Rotate(rot);
+
+            var color = _objects[i].OrbFrequency.color;
+            _frequencyColors[i] = color;
         }
         
         var posistionsArray = _positions.ToArray();
         var sizesArray = _sizes.ToArray();
         var rotationsArray = _rotationMatrices.ToArray();
-        var colorsArray = _colors.ToArray();
+        var colorsArray = _frequencyColors.ToArray();
 
         _material.SetVectorArray("_Positions", posistionsArray);
         _material.SetFloatArray("_Sizes", sizesArray);

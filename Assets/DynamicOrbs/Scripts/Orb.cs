@@ -2,12 +2,25 @@ using UnityEngine;
 
 public class Orb : MonoBehaviour
 {
-    public Renderer Renderer { get => _renderer; }
+    public Renderer Renderer => _renderer;
+    public OrbState CurrentOrbState => _orbState;
+    public OrbFrequency OrbFrequency => _orbFrequency;
 
+    public enum OrbState
+    {
+        Disabled = 0,
+        Enabled = 1
+    }
+
+    private OrbState _orbState;
+    private OrbFrequency _orbFrequency;
+
+    [Header("Component References")]
     [SerializeField] private Renderer _renderer;
     [SerializeField] private SphereCollider _collider;
     [SerializeField] private Rigidbody _rigidBody;
     
+    [Header("Movement Properties")]
     [SerializeField] private float xBounds = 0.5f;
     [SerializeField] private float yBounds = 0.5f;
     [SerializeField] private float zBounds = 0.5f;
@@ -27,8 +40,25 @@ public class Orb : MonoBehaviour
         _rigidBody.velocity = HelperMethods.GetRandomVec3() * _velocityMultiplier;
     }
 
+    public void InitOrb(Vector3 position, Vector3 velocity, OrbFrequency freq)
+    {
+        _orbState = OrbState.Enabled;
+        _renderer.enabled = true;
+        transform.position = position;
+        _rigidBody.velocity = velocity;
+        _orbFrequency = freq;
+    }
+    
+    public void DisableOrb()
+    {
+        _orbState = OrbState.Disabled;
+        _renderer.enabled = false;
+        transform.position = new Vector3(0, 100, 0);
+    }
+
     private void Update()
     {
+        if (_orbState == OrbState.Disabled) return;
         UpdateRigidbodies();
     }
 
@@ -75,4 +105,8 @@ public class Orb : MonoBehaviour
             _rigidBody.velocity = new Vector3(v.x, v.y, -v.z);
         }
     }
+
+   
+
+   
 }
