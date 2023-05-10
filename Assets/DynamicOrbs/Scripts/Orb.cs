@@ -26,13 +26,20 @@ public class Orb : MonoBehaviour
     [SerializeField] private Rigidbody _rigidBody;
     
     [Header("Movement Properties")]
-    [SerializeField] private float xBounds = 0.5f;
-    [SerializeField] private float yBounds = 0.5f;
-    [SerializeField] private float zBounds = 0.5f;
+    [SerializeField] private float _xBounds = 0.5f;
+    [SerializeField] private float _yBounds = 0.5f;
+    [SerializeField] private float _zBounds = 0.5f;
     [SerializeField] private float _velocityMultiplier = 0.1f;
     [SerializeField] private float _minVelocity = 0.05f;
     [SerializeField] private float _minScale = 0.2f;
     [SerializeField] private float _maxScale = 1f;
+
+    private float _localBoundsLowerX;
+    private float _localBoundsUpperX;
+    private float _localBoundsLowerY;
+    private float _localBoundsUpperY;
+    private float _localBoundsLowerZ;
+    private float _localBoundsUpperZ;
 
     private float _popInDuration = 1f;
     private Vector3 _startingVelocity;
@@ -50,16 +57,18 @@ public class Orb : MonoBehaviour
     {
         if (_orbState == OrbState.Disabled) return;
         UpdateIntensity();
-        //UpdateRigidbodies();
+        UpdateRigidbodies();
     }
 
-    public void InitOrb(Vector3 position, Vector3 velocity, OrbFrequency freq)
+    public void InitOrb(Vector3 origin, Vector3 position, Vector3 velocity, OrbFrequency freq)
     {
         StartCoroutine(PopIn());
         _renderer.enabled = true;
         transform.position = position;
         _rigidBody.velocity = velocity;
         _orbFrequency = freq;
+        _origin = origin;
+        SetLocalBounds(_origin);
     }
     
     public void DisableOrb()
@@ -90,6 +99,17 @@ public class Orb : MonoBehaviour
         _intensity = AudioSpectrumReader.audioBandIntensityBuffer[_orbFrequency.band];
     }
 
+    private void SetLocalBounds(Vector3 origin)
+    {
+        _localBoundsLowerX = origin.x - _xBounds;
+        _localBoundsUpperX = origin.x + _xBounds;
+        _localBoundsLowerY = origin.y - _yBounds;
+        _localBoundsUpperY = origin.y + _yBounds;
+        _localBoundsLowerZ = origin.z - _zBounds;
+        _localBoundsUpperZ = origin.z + _zBounds;
+    }
+
+
     private void UpdateRigidbodies()
     {
         var p = _rigidBody.transform.position;
@@ -100,36 +120,36 @@ public class Orb : MonoBehaviour
             _rigidBody.velocity *= 1.1f;
         }
 
-        if (_rigidBody.transform.position.x > xBounds)
+        if (_rigidBody.transform.position.x > _localBoundsUpperX)
         {
-            _rigidBody.transform.position = new Vector3(xBounds, p.y, p.z);
+            _rigidBody.transform.position = new Vector3(_localBoundsUpperX, p.y, p.z);
             _rigidBody.velocity = new Vector3(-v.x, v.y, v.z);
         }
-        else if (_rigidBody.transform.position.x < -xBounds)
+        else if (_rigidBody.transform.position.x < _localBoundsLowerX)
         {
-            _rigidBody.transform.position = new Vector3(-xBounds, p.y, p.z);
+            _rigidBody.transform.position = new Vector3(_localBoundsLowerX, p.y, p.z);
             _rigidBody.velocity = new Vector3(-v.x, v.y, v.z);
         }
 
-        if (_rigidBody.transform.position.y > yBounds)
+        if (_rigidBody.transform.position.y > _localBoundsUpperY)
         {
-            _rigidBody.transform.position = new Vector3(p.x, yBounds, p.z);
+            _rigidBody.transform.position = new Vector3(p.x, _localBoundsUpperY, p.z);
             _rigidBody.velocity = new Vector3(v.x, -v.y, v.z);
         }
-        else if (_rigidBody.transform.position.y < -yBounds)
+        else if (_rigidBody.transform.position.y < _localBoundsLowerY)
         {
-            _rigidBody.transform.position = new Vector3(p.x, -yBounds, p.z);
+            _rigidBody.transform.position = new Vector3(p.x, _localBoundsLowerY, p.z);
             _rigidBody.velocity = new Vector3(v.x, -v.y, v.z);
         }
 
-        if (_rigidBody.transform.position.z > zBounds)
+        if (_rigidBody.transform.position.z > _localBoundsUpperZ)
         {
-            _rigidBody.transform.position = new Vector3(p.x, p.y, zBounds);
+            _rigidBody.transform.position = new Vector3(p.x, p.y, _localBoundsUpperZ);
             _rigidBody.velocity = new Vector3(v.x, v.y, -v.z);
         }
-        else if (_rigidBody.transform.position.z < -zBounds)
+        else if (_rigidBody.transform.position.z < _localBoundsLowerZ)
         {
-            _rigidBody.transform.position = new Vector3(p.x, p.y, -zBounds);
+            _rigidBody.transform.position = new Vector3(p.x, p.y, _localBoundsLowerZ);
             _rigidBody.velocity = new Vector3(v.x, v.y, -v.z);
         }
     }

@@ -13,6 +13,7 @@ public class DynamicGlowingOrbs : MonoBehaviour
     [SerializeField] private Material _material;
     [SerializeField] private List<Orb> _objects = new List<Orb>();
     [SerializeField] private float _scaleFactor = 0.35f;
+    [SerializeField] private LaunchEffect _launchEffect;
     //[SerializeField] [Range(0, 1)] private float _glowIntensity = 1.0f;
     
     [Header("Colors")] 
@@ -28,7 +29,7 @@ public class DynamicGlowingOrbs : MonoBehaviour
     private List<Orb> _disabledOrbs = new List<Orb>();
     private List<Color> _frequencyColors = new List<Color>();
 
-
+    private Vector3 _origin;
 
     void Start()
     {
@@ -47,18 +48,27 @@ public class DynamicGlowingOrbs : MonoBehaviour
     {
         if (PlatformAgnosticInput.touchCount < 0) return;
         var touch = PlatformAgnosticInput.GetTouch(0);
+        
+        var touchPos = touch.position;
+        var launchEffectPos = _mainCamera.ScreenToWorldPoint(new Vector3(touchPos.x, touchPos.y, 0.25f));
+        _launchEffect.SetTargetPos(launchEffectPos);
+        
         if (touch.phase == TouchPhase.Began)
         {
+            _launchEffect.Init(launchEffectPos);
             var launchDistance = 1f;
-            var touchPos = touch.position;
+            var magnitude = 1f; // update this to be proportional to the hold length on release
             var position = _mainCamera.ScreenToWorldPoint(new Vector3(touchPos.x, touchPos.y, launchDistance));
-            Debug.Log($"Touch Pos: {touch.position}, World Pos: {position}");
-            // var position = _mainCamera.transform.position + _mainCamera.transform.forward * 2f;
-            var magnitude = 1; // update this to be proportional to the hold length on release
             var velocity = _mainCamera.transform.forward * magnitude;
             LaunchOrb(_currentBand, position, velocity);
         }
+        else if (touch.phase == TouchPhase.Ended)
+        {
+            _launchEffect.Disable();
+        }
     }
+    
+    
 
     private void InitLists()
     {
@@ -92,6 +102,9 @@ public class DynamicGlowingOrbs : MonoBehaviour
         
         if (_disabledOrbs.Count > 0)
         {
+            // set origin of first orb
+            if (_disabledOrbs.Count == _objects.Count)
+                _origin = pos + _mainCamera.transform.forward * 4f;
             // take from list of disabled orbs if there are any
             orb = _disabledOrbs[0];
             _disabledOrbs.Remove(orb);
@@ -105,7 +118,7 @@ public class DynamicGlowingOrbs : MonoBehaviour
         
         // add orb from above to end of enabled orb list an init
         _enabledOrbs.Add(orb);
-        orb.InitOrb(pos, velocity, freq);
+        orb.InitOrb(_origin, pos, velocity, freq);
     }
 
     /// <summary>
