@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class Orb : MonoBehaviour
@@ -5,15 +6,19 @@ public class Orb : MonoBehaviour
     public Renderer Renderer => _renderer;
     public OrbState CurrentOrbState => _orbState;
     public OrbFrequency OrbFrequency => _orbFrequency;
+    public float Intensity => _intensity;
 
     public enum OrbState
     {
         Disabled = 0,
-        Enabled = 1
+        Enabled = 1,
+        PoppingIn = 2,
+        PoppingOut = 3
     }
 
     private OrbState _orbState;
     private OrbFrequency _orbFrequency;
+    private float _intensity;
 
     [Header("Component References")]
     [SerializeField] private Renderer _renderer;
@@ -28,7 +33,8 @@ public class Orb : MonoBehaviour
     [SerializeField] private float _minVelocity = 0.05f;
     [SerializeField] private float _minScale = 0.2f;
     [SerializeField] private float _maxScale = 1f;
-    
+
+    private float _popInDuration = 1f;
     private Vector3 _startingVelocity;
     private Vector3 _origin;
     private Vector3 _baseScale;
@@ -39,10 +45,17 @@ public class Orb : MonoBehaviour
         _baseScale = new Vector3(1, 1, 1);
         _rigidBody.velocity = HelperMethods.GetRandomVec3() * _velocityMultiplier;
     }
+    
+    private void Update()
+    {
+        if (_orbState == OrbState.Disabled) return;
+        UpdateIntensity();
+        //UpdateRigidbodies();
+    }
 
     public void InitOrb(Vector3 position, Vector3 velocity, OrbFrequency freq)
     {
-        _orbState = OrbState.Enabled;
+        StartCoroutine(PopIn());
         _renderer.enabled = true;
         transform.position = position;
         _rigidBody.velocity = velocity;
@@ -56,10 +69,25 @@ public class Orb : MonoBehaviour
         transform.position = new Vector3(0, 100, 0);
     }
 
-    private void Update()
+    private IEnumerator PopIn()
     {
-        if (_orbState == OrbState.Disabled) return;
-        UpdateRigidbodies();
+        _orbState = OrbState.PoppingIn;
+
+        for (float t = 0; t < _popInDuration; t += Time.deltaTime)
+        {
+            var scale = Mathf.Lerp(0f, 1f, t / _popInDuration);
+            transform.localScale = new Vector3(scale, scale, scale);
+            
+            yield return null;
+        }
+        
+        transform.localScale = Vector3.one;
+        _orbState = OrbState.Enabled;
+    }
+
+    private void UpdateIntensity()
+    {
+        _intensity = AudioSpectrumReader.audioBandIntensityBuffer[_orbFrequency.band];
     }
 
     private void UpdateRigidbodies()

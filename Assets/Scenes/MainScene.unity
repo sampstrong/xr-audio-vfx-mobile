@@ -3594,7 +3594,7 @@ MonoBehaviour:
   mixerGroupMicrophone: {fileID: 441421434239032682, guid: 90620fd3a3a7a4d398c39cd9e2d9ca02,
     type: 2}
   mixerGroupMaster: {fileID: 24300002, guid: 90620fd3a3a7a4d398c39cd9e2d9ca02, type: 2}
-  audioProfile: 5
+  audioProfile: 1
   channel: 0
 --- !u!82 &820142691
 AudioSource:
@@ -9503,6 +9503,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb1ef4567382b4f70938ac72a52e78e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _mainCamera: {fileID: 397243964}
+  _currentBand: 0
   _material: {fileID: 2100000, guid: 5e04b3e53bfc34b94969ca3f66e74767, type: 2}
   _objects:
   - {fileID: 7192305368393764060}
@@ -9514,16 +9516,15 @@ MonoBehaviour:
   - {fileID: 473023014}
   - {fileID: 1353287277}
   _scaleFactor: 0.35
-  _glowIntensity: 1
   _colors:
-  - {r: 0, g: 0.8862745, b: 1.4980392, a: 1}
-  - {r: 0, g: 0.45490196, b: 1.4980392, a: 1}
-  - {r: 0.26666668, g: 0, b: 1.4980392, a: 1}
-  - {r: 0.7058824, g: 0, b: 1.4980392, a: 1}
-  - {r: 1.4980392, g: 0, b: 1.3019608, a: 1}
-  - {r: 1.4980392, g: 0, b: 0.26666668, a: 1}
-  - {r: 1.4980392, g: 0, b: 0, a: 1}
-  - {r: 2, g: 0.40784314, b: 0, a: 1}
+  - {r: 0, g: 1.2533814, b: 2.1185474, a: 1}
+  - {r: 0, g: 0.6433285, b: 2.1185474, a: 1}
+  - {r: 0.23330414, g: 0, b: 2.1185474, a: 1}
+  - {r: 0.48348677, g: 0, b: 2.1185474, a: 1}
+  - {r: 2.5392418, g: 0.06670818, b: 2.828427, a: 1}
+  - {r: 2.828427, g: 0, b: 0.5102261, a: 1}
+  - {r: 2.1185474, g: 0, b: 0, a: 1}
+  - {r: 2.1185474, g: 0.3563935, b: 0, a: 1}
 --- !u!1 &7192305369007631260
 GameObject:
   m_ObjectHideFlags: 0

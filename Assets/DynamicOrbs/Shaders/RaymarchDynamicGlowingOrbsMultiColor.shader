@@ -15,7 +15,6 @@ Shader "Raymarch/DynamicGlowingOrbsMultiColor"
     	_GyroidSmoothAmount ("Gyroid Smooth Amount", Float) = 0.1
     	_Gloss ("Gloss", Range(1, 100)) = 1.5
     	_ScatteringRadius ("Scattering Radius", Float) = 1
-    	_Intensity("Intensity", Float) = 1
     	
     }
     SubShader
@@ -63,14 +62,14 @@ Shader "Raymarch/DynamicGlowingOrbsMultiColor"
             float _Gloss;
             float _ScatteringRadius;
             float _TestScale = 0.4;
-            float _Intensity;
+            
 
             uniform int _NumberOfObjects;
-            uniform float4 _Positions[10];
-            uniform float _Sizes[10];
-            uniform float4x4 _Rotations[10];
+            uniform float4 _Positions[8];
+            uniform float _Sizes[8];
+            uniform float4x4 _Rotations[8];
 
-            uniform fixed4 _Colors[10];
+            uniform fixed4 _Colors[8];
 
             v2f vert (appdata v)
             {
@@ -376,7 +375,7 @@ Shader "Raymarch/DynamicGlowingOrbsMultiColor"
                 	
                     col.rgb = l * _BaseColor;
                 	// col.rgb += sss * (_GlowColor * _Intensity);
-                	col.rgb += sss * (d.rgb * _Intensity);
+                	col.rgb += sss * d.rgb;
 
                 	// surface dots
                 	float noise = 1.0 - clamp(snoise(pRot * _NoiseScale), 0.6, 0.8);

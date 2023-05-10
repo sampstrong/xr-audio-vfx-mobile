@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.ComponentModel.Design;
+using Niantic.ARDK.Utilities.Input.Legacy;
 using Sirenix.OdinInspector;
 using Sirenix.Utilities;
 using UnityEngine;
@@ -6,10 +8,12 @@ using UnityEngine;
 // [ExecuteInEditMode]
 public class DynamicGlowingOrbs : MonoBehaviour
 {
+    [SerializeField] private Camera _mainCamera;
+    [SerializeField] private int _currentBand;
     [SerializeField] private Material _material;
     [SerializeField] private List<Orb> _objects = new List<Orb>();
     [SerializeField] private float _scaleFactor = 0.35f;
-    [SerializeField] [Range(0, 1)] private float _glowIntensity = 1.0f;
+    //[SerializeField] [Range(0, 1)] private float _glowIntensity = 1.0f;
     
     [Header("Colors")] 
     [ColorUsageAttribute(true, true)] 
@@ -23,8 +27,9 @@ public class DynamicGlowingOrbs : MonoBehaviour
     private List<Orb> _enabledOrbs = new List<Orb>();
     private List<Orb> _disabledOrbs = new List<Orb>();
     private List<Color> _frequencyColors = new List<Color>();
-    
-    
+
+
+
     void Start()
     {
         InitLists();
@@ -34,7 +39,25 @@ public class DynamicGlowingOrbs : MonoBehaviour
     void Update()
     {
         UpdateShaderUniforms();
-        _material.SetFloat("_Intensity", _glowIntensity);
+        CheckForTouch();
+        //_material.SetFloat("_Intensity", _glowIntensity);
+    }
+
+    private void CheckForTouch()
+    {
+        if (PlatformAgnosticInput.touchCount < 0) return;
+        var touch = PlatformAgnosticInput.GetTouch(0);
+        if (touch.phase == TouchPhase.Began)
+        {
+            var launchDistance = 1f;
+            var touchPos = touch.position;
+            var position = _mainCamera.ScreenToWorldPoint(new Vector3(touchPos.x, touchPos.y, launchDistance));
+            Debug.Log($"Touch Pos: {touch.position}, World Pos: {position}");
+            // var position = _mainCamera.transform.position + _mainCamera.transform.forward * 2f;
+            var magnitude = 1; // update this to be proportional to the hold length on release
+            var velocity = _mainCamera.transform.forward * magnitude;
+            LaunchOrb(_currentBand, position, velocity);
+        }
     }
 
     private void InitLists()
@@ -62,25 +85,27 @@ public class DynamicGlowingOrbs : MonoBehaviour
     /// Launch the next available orb
     /// </summary>
     [Button]
-    private void LaunchOrb(int band)
+    private void LaunchOrb(int band, Vector3 pos, Vector3 velocity)
     {
         var freq = new OrbFrequency(band, _colors[band]);
+        Orb orb;
         
         if (_disabledOrbs.Count > 0)
         {
-            var orb = _disabledOrbs[0];
+            // take from list of disabled orbs if there are any
+            orb = _disabledOrbs[0];
             _disabledOrbs.Remove(orb);
-            _enabledOrbs.Add(orb);
-            orb.InitOrb(HelperMethods.GetRandomVec3(), HelperMethods.GetRandomVec3(), freq);
         }
         else
         {
-            // add a pop in / pop out animation here
-            var orb = _enabledOrbs[0];
+            // if not take the first enabled orb
+            orb = _enabledOrbs[0];
             _enabledOrbs.Remove(orb);
-            _enabledOrbs.Add(orb);
-            orb.InitOrb(HelperMethods.GetRandomVec3(), HelperMethods.GetRandomVec3(), freq);
         }
+        
+        // add orb from above to end of enabled orb list an init
+        _enabledOrbs.Add(orb);
+        orb.InitOrb(pos, velocity, freq);
     }
 
     /// <summary>
@@ -92,7 +117,7 @@ public class DynamicGlowingOrbs : MonoBehaviour
         _frequencyColors.AddRange(_colors);
         _disabledOrbs.AddRange(_objects);
         _enabledOrbs.Clear();
-        
+
         foreach (var orb in _objects)
         {
             orb.DisableOrb();
@@ -117,7 +142,7 @@ public class DynamicGlowingOrbs : MonoBehaviour
             _rotationMatrices[i] = Matrix4x4.Rotate(rot);
 
             var color = _objects[i].OrbFrequency.color;
-            _frequencyColors[i] = color;
+            _frequencyColors[i] = color * _objects[i].Intensity;
         }
         
         var posistionsArray = _positions.ToArray();
