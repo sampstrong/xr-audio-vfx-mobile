@@ -9,6 +9,8 @@ using UnityEngine.Experimental.GlobalIllumination;
 // [ExecuteInEditMode]
 public class DynamicGlowingOrbs : MonoBehaviour
 {
+    public List<Orb> Objects => _objects;
+    
     [SerializeField] private Camera _mainCamera;
     [SerializeField] private int _currentBand;
     [SerializeField] private Material _material;

@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.VFX;
 
 public class LaunchEffect : MonoBehaviour
 {
     [SerializeField] private Renderer _renderer;
+    [SerializeField] private VisualEffect _edgeEffect;
     
     private Vector3 _targetPos;
 
@@ -12,11 +14,13 @@ public class LaunchEffect : MonoBehaviour
     {
         _targetPos = targetPos;
         _renderer.enabled = true;
+        _edgeEffect.gameObject.SetActive(true);
     }
 
     public void Disable()
     {
         _renderer.enabled = false;
+        _edgeEffect.gameObject.SetActive(false);
     }
 
     private IEnumerator PopIn()
@@ -35,8 +39,8 @@ public class LaunchEffect : MonoBehaviour
         transform.position = _targetPos;
     }
 
-    // void Update()
-    // {
-    //     transform.position = _targetPos;
-    // }
+    void Update()
+    {
+        transform.LookAt(ServiceLocator.Instance.ARCamera.transform);
+    }
 }

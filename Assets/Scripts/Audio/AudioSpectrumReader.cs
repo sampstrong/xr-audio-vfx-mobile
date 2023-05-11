@@ -23,7 +23,7 @@ public class AudioSpectrumReader : MonoBehaviour
     public static float[] bandBuffer = new float[8];
     private float[] _bufferDecrease = new float[8];
 
-    private float[] _freqBandHighest = new float[8];
+    public static float[] _freqBandHighest = new float[8];
     public static float[] audioBandIntensity = new float[8];
     public static float[] audioBandIntensityBuffer = new float[8];
 
