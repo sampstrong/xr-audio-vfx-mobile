@@ -23,8 +23,13 @@ public class BandSelector : MonoBehaviour
     [SerializeField] private Color _currentColor;
     [SerializeField] private TextMeshProUGUI _currentBandText;
 
-    private int _currentBand = 0;
-    private int _currentBandLast = 0;
+    private int _currentBand = 1;
+    private int _currentBandLast = 1;
+
+    private void Start()
+    {
+        ChangeColor(_orbs.Colors[_currentBand - 1]);
+    }
 
     [Button]
     private void ChangeColor(Color color)
@@ -101,4 +106,5 @@ public class BandSelector : MonoBehaviour
             
         }
     }
+    
 }

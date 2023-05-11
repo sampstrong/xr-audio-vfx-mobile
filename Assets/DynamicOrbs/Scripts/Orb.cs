@@ -1,5 +1,8 @@
+using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Assertions.Must;
+using Random = UnityEngine.Random;
 
 public class Orb : MonoBehaviour
 {
@@ -31,8 +34,11 @@ public class Orb : MonoBehaviour
     [SerializeField] private float _zBounds = 0.5f;
     [SerializeField] private float _velocityMultiplier = 0.1f;
     [SerializeField] private float _minVelocity = 0.05f;
+    [SerializeField] private float _maxVelocity = 0.5f;
     [SerializeField] private float _minScale = 0.2f;
     [SerializeField] private float _maxScale = 1f;
+
+    [SerializeField] private float _scalingSpeed = 0.5f;
 
     private float _localBoundsLowerX;
     private float _localBoundsUpperX;
@@ -46,19 +52,25 @@ public class Orb : MonoBehaviour
     private Vector3 _origin;
     private Vector3 _baseScale;
 
+    private float _randomNumber;
+    private float _currentScale;
+
     private void Start()
     {
         _origin = new Vector3(0, 0, 0);
         _baseScale = new Vector3(1, 1, 1);
         _rigidBody.velocity = HelperMethods.GetRandomVec3() * _velocityMultiplier;
+        _randomNumber = Random.Range(0f, 1000f);
     }
     
-    private void Update()
+    private void FixedUpdate()
     {
         if (_orbState == OrbState.Disabled) return;
         UpdateIntensity();
         UpdateRigidbodies();
-        UpdateScale();
+        // UpdateScale();
+
+        SetScale();
     }
 
     public void InitOrb(Vector3 origin, Vector3 position, Vector3 velocity, OrbFrequency freq)
@@ -68,6 +80,7 @@ public class Orb : MonoBehaviour
         transform.position = position;
         _rigidBody.velocity = velocity;
         _orbFrequency = freq;
+        // _origin = origin;
         _origin = origin;
         SetLocalBounds(_origin);
     }
@@ -85,7 +98,7 @@ public class Orb : MonoBehaviour
 
         for (float t = 0; t < _popInDuration; t += Time.deltaTime)
         {
-            var scale = Mathf.Lerp(0f, 1f, t / _popInDuration);
+            var scale = Mathf.Lerp(0f, _currentScale, t / _popInDuration);
             transform.localScale = new Vector3(scale, scale, scale);
             
             yield return null;
@@ -119,6 +132,12 @@ public class Orb : MonoBehaviour
         if (v.magnitude < _minVelocity)
         {
             _rigidBody.velocity *= 1.1f;
+        }
+
+        if (v.magnitude > _maxVelocity)
+        {
+            // _rigidBody.velocity /= 1.1f;
+            _rigidBody.velocity = _rigidBody.velocity.normalized * _maxVelocity;
         }
 
         if (_rigidBody.transform.position.x > _localBoundsUpperX)
@@ -159,9 +178,28 @@ public class Orb : MonoBehaviour
     private void UpdateScale()
     {
         var dist = Vector3.Distance(transform.position, _origin);
-        var scale = Mathf.Clamp((_xBounds / 2.0f) / dist, _minScale, _maxScale);
+        var scale = Mathf.Clamp((_xBounds / 1.0f) / dist, _minScale, _maxScale);
 
         transform.localScale = _baseScale * scale;
     }
-   
+
+    private void SetScale()
+    {
+        var sinScale = Mathf.Sin((Time.unscaledTime + _randomNumber) * _scalingSpeed) * 0.5f + 0.5f; // fluctuates between 0 and 1
+        var remappedScale = sinScale * (_maxScale - _minScale) + _minScale; // mapped to max and min values
+        
+        remappedScale *= Mathf.Cos((Time.unscaledTime + _randomNumber * 0.5f) * _scalingSpeed * 0.75f) * 0.3f + 0.6f; // add some randomness
+        remappedScale = Mathf.Clamp(remappedScale, _minScale, _maxScale);
+        
+        _currentScale = remappedScale;
+
+        if (_orbState == OrbState.PoppingIn) return;
+
+        transform.localScale = new Vector3(remappedScale, remappedScale, remappedScale);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        _rigidBody.velocity = -_rigidBody.velocity;
+    }
 }

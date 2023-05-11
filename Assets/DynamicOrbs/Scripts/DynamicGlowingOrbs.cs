@@ -18,7 +18,6 @@ public class DynamicGlowingOrbs : MonoBehaviour
     [SerializeField] private List<Orb> _objects = new List<Orb>();
     [SerializeField] private float _scaleFactor = 0.35f;
     [SerializeField] private LaunchEffect _launchEffect;
-    //[SerializeField] [Range(0, 1)] private float _glowIntensity = 1.0f;
 
     [SerializeField] private Light _light;
     
@@ -48,7 +47,6 @@ public class DynamicGlowingOrbs : MonoBehaviour
     {
         UpdateShaderUniforms();
         CheckForTouch();
-        //_material.SetFloat("_Intensity", _glowIntensity);
     }
 
     private void CheckForTouch()
@@ -64,10 +62,8 @@ public class DynamicGlowingOrbs : MonoBehaviour
         
         if (touch.phase == TouchPhase.Began)
         {
-            Debug.Log($"Light enabled?: {_light.enabled}");
-            
             _launchEffect.Init(launchEffectPos);
-            var launchDistance = 1f;
+            var launchDistance = 3f;
             var magnitude = 0.5f; // update this to be proportional to the hold length on release
             var position = _mainCamera.ScreenToWorldPoint(new Vector3(touchPos.x, touchPos.y, launchDistance));
             var velocity = _mainCamera.transform.forward * magnitude;
@@ -112,8 +108,8 @@ public class DynamicGlowingOrbs : MonoBehaviour
         if (_disabledOrbs.Count > 0)
         {
             // set origin of first orb
-            if (_disabledOrbs.Count == _objects.Count)
-                _origin = pos + _mainCamera.transform.forward * 4f;
+            // if (_disabledOrbs.Count == _objects.Count)
+            //     _origin = pos + _mainCamera.transform.forward * 4f;
             // take from list of disabled orbs if there are any
             orb = _disabledOrbs[0];
             _disabledOrbs.Remove(orb);
@@ -127,7 +123,9 @@ public class DynamicGlowingOrbs : MonoBehaviour
         
         // add orb from above to end of enabled orb list an init
         _enabledOrbs.Add(orb);
-        orb.InitOrb(_origin, pos, velocity, freq);
+
+        var origin = pos + Vector3.up * 1.5f;
+        orb.InitOrb(origin, pos, velocity, freq);
     }
 
     /// <summary>
@@ -182,6 +180,11 @@ public class DynamicGlowingOrbs : MonoBehaviour
         Vector3 lightVector = _light.transform.rotation * Vector3.forward;
         _material.SetVector("_LightPos", -lightVector);
         _material.SetColor("_LightCol", _light.color);
+        
+        //0.04 is a good value 
+        //_material.SetFloat("_GyroidSmoothAmount", Mathf.Sin(Time.unscaledTime) * 0.04f);
+        
+        _material.SetFloat("_GyroidThickness", (Mathf.Sin(Time.unscaledTime * 0.5f) * 0.5f + 0.5f) * 0.1f);
     }
 
     public void SetCurrentBand(int newBand)

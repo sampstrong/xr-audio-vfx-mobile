@@ -30,10 +30,10 @@ Material:
     - _FresnelIntensity: 0.85
     - _FresnelRamp: 0.77
     - _Gloss: 2
-    - _GyroidExtrusion: 1.29
+    - _GyroidExtrusion: 1.09
     - _GyroidScale: 3.15
     - _GyroidSmoothAmount: 0.04
-    - _GyroidThickness: 0.1
+    - _GyroidThickness: 0.04601292
     - _Intensity: 1
     - _NoiseScale: 106.3
     - _ScatteringRadius: 4.03

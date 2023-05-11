@@ -8,6 +8,7 @@ using UnityEngine.EventSystems;
 public class MenuController : MonoBehaviour
 {
     [SerializeField] private Page _initialPage;
+    [SerializeField] private Page _startingOverlay;
     [SerializeField] private GameObject _firstFocusItem;
 
     private Canvas _rootCanvas;
@@ -29,6 +30,11 @@ public class MenuController : MonoBehaviour
         if (_initialPage != null)
         {
             PushPage(_initialPage);
+        }
+
+        if (_startingOverlay != null)
+        {
+            PushPage(_startingOverlay);
         }
     }
 
