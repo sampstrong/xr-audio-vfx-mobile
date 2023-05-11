@@ -6,7 +6,7 @@ using UnityEngine.VFX;
 public class LaunchEffect : MonoBehaviour
 {
     [SerializeField] private Renderer _renderer;
-    [SerializeField] private VisualEffect _edgeEffect;
+    [SerializeField] private VisualEffect[] _particleEffects;
     
     private Vector3 _targetPos;
 
@@ -14,13 +14,19 @@ public class LaunchEffect : MonoBehaviour
     {
         _targetPos = targetPos;
         _renderer.enabled = true;
-        _edgeEffect.gameObject.SetActive(true);
+        foreach (var e in _particleEffects)
+        {
+            e.gameObject.SetActive(true);
+        }
     }
 
     public void Disable()
     {
         _renderer.enabled = false;
-        _edgeEffect.gameObject.SetActive(false);
+        foreach (var e in _particleEffects)
+        {
+            e.gameObject.SetActive(false);
+        }
     }
 
     private IEnumerator PopIn()
@@ -42,5 +48,13 @@ public class LaunchEffect : MonoBehaviour
     void Update()
     {
         transform.LookAt(ServiceLocator.Instance.ARCamera.transform);
+    }
+
+    public void SetColor(Color color)
+    {
+        foreach (var e in _particleEffects)
+        {
+            e.SetVector4("_Color", color);
+        }
     }
 }

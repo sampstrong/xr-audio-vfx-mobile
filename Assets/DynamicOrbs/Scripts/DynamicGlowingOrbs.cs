@@ -10,6 +10,7 @@ using UnityEngine.Experimental.GlobalIllumination;
 public class DynamicGlowingOrbs : MonoBehaviour
 {
     public List<Orb> Objects => _objects;
+    public List<Color> Colors => _colors;
     
     [SerializeField] private Camera _mainCamera;
     [SerializeField] private int _currentBand;
@@ -54,6 +55,8 @@ public class DynamicGlowingOrbs : MonoBehaviour
     {
         if (PlatformAgnosticInput.touchCount <= 0) return;
         var touch = PlatformAgnosticInput.GetTouch(0);
+
+        if (TouchManager.CurrentTouchZone != TouchManager.TouchZone.World) return;
         
         var touchPos = touch.position;
         var launchEffectPos = _mainCamera.ScreenToWorldPoint(new Vector3(touchPos.x, touchPos.y, 0.25f));
@@ -179,5 +182,10 @@ public class DynamicGlowingOrbs : MonoBehaviour
         Vector3 lightVector = _light.transform.rotation * Vector3.forward;
         _material.SetVector("_LightPos", -lightVector);
         _material.SetColor("_LightCol", _light.color);
+    }
+
+    public void SetCurrentBand(int newBand)
+    {
+        _currentBand = newBand;
     }
 }
