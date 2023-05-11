@@ -35,8 +35,8 @@ public class LaunchEffect : MonoBehaviour
         transform.position = _targetPos;
     }
 
-    void Update()
-    {
-        transform.position = _targetPos;
-    }
+    // void Update()
+    // {
+    //     transform.position = _targetPos;
+    // }
 }

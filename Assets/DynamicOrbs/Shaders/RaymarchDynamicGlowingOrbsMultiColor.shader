@@ -15,6 +15,7 @@ Shader "Raymarch/DynamicGlowingOrbsMultiColor"
     	_GyroidSmoothAmount ("Gyroid Smooth Amount", Float) = 0.1
     	_Gloss ("Gloss", Range(1, 100)) = 1.5
     	_ScatteringRadius ("Scattering Radius", Float) = 1
+    	_AmbientLight ("AmbientLight", Float) = 1
     	
     }
     SubShader
@@ -62,14 +63,17 @@ Shader "Raymarch/DynamicGlowingOrbsMultiColor"
             float _Gloss;
             float _ScatteringRadius;
             float _TestScale = 0.4;
+            float _AmbientLight;
             
 
             uniform int _NumberOfObjects;
             uniform float4 _Positions[8];
             uniform float _Sizes[8];
             uniform float4x4 _Rotations[8];
-
             uniform fixed4 _Colors[8];
+
+            uniform float4 _LightPos;
+            uniform fixed4 _LightCol;
 
             v2f vert (appdata v)
             {
@@ -86,8 +90,10 @@ Shader "Raymarch/DynamicGlowingOrbsMultiColor"
             
             float3 getDiffuseLight(float3 normal)
             {
-                float3 lightDir = _WorldSpaceLightPos0.xyz;
-                float3 lightColor = _LightColor0.rgb;
+                // float3 lightDir = _WorldSpaceLightPos0.xyz;
+                // float3 lightColor = _LightColor0.rgb;
+            	float3 lightDir = _LightPos;
+            	float3 lightColor = _LightCol;
                 float lightFalloff = max(0, dot(lightDir, normal));
                 float3 directDiffuseLight = lightColor * lightFalloff;
 
@@ -96,7 +102,9 @@ Shader "Raymarch/DynamicGlowingOrbsMultiColor"
 
             float3 getAmbientLight(float3 normal)
             {
-                float3 a = ShadeSH9(float4(normal, 1.0));
+                // float3 a = ShadeSH9(float4(normal, 1.0));
+
+            	float3 a = _AmbientLight;
 
                 return a;
             }
@@ -108,7 +116,8 @@ Shader "Raymarch/DynamicGlowingOrbsMultiColor"
                 float3 viewDir = normalize(fragToCam);
                 float3 viewReflect = reflect(-viewDir, normal);
                 
-                float specularFalloff = max(0, dot(viewReflect, _WorldSpaceLightPos0.xyz));
+                // float specularFalloff = max(0, dot(viewReflect, _WorldSpaceLightPos0.xyz));
+            	float specularFalloff = max(0, dot(viewReflect, _LightPos));
                 specularFalloff = pow(specularFalloff, _Gloss);
 
                 return specularFalloff;
@@ -119,7 +128,8 @@ Shader "Raymarch/DynamicGlowingOrbsMultiColor"
 	            float3 diffuse = getDiffuseLight(normal);
                 float3 ambient = getAmbientLight(normal);
                 float3 specular = getSpecularLight(normal, worldPos);
-                float3 directSpecular = specular * _LightColor0.rgb;
+                // float3 directSpecular = specular * _LightColor0.rgb;
+            	float3 directSpecular = specular * _LightCol;
                 float3 diffuseLight = ambient + diffuse;
                 float3 finalSurfaceColor = diffuseLight * _BaseColor.rgb + directSpecular;
 

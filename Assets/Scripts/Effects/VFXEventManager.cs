@@ -60,7 +60,7 @@ public static class VFXEventManager
         
         if (band == 1)
         {
-            Debug.Log($"Beat count: {beatCounter[band]}");
+            // Debug.Log($"Beat count: {beatCounter[band]}");
         }
 
         if (beatCounter[band] == 2)
@@ -68,7 +68,7 @@ public static class VFXEventManager
             onHalfBar?.Invoke(band);
             if (band == 1)
             {
-                Debug.Log("On Half Bar Invoked");
+                // Debug.Log("On Half Bar Invoked");
             }
         }
         else if (beatCounter[band] == 4)
@@ -77,7 +77,7 @@ public static class VFXEventManager
             beatCounter[band] = 0;
             if (band == 1)
             {
-                Debug.Log("On Bar Invoked");
+                // Debug.Log("On Bar Invoked");
             }
         }
         else if (beatCounter[band] > 4)

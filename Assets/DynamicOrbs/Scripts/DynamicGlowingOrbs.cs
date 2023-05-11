@@ -4,6 +4,7 @@ using Niantic.ARDK.Utilities.Input.Legacy;
 using Sirenix.OdinInspector;
 using Sirenix.Utilities;
 using UnityEngine;
+using UnityEngine.Experimental.GlobalIllumination;
 
 // [ExecuteInEditMode]
 public class DynamicGlowingOrbs : MonoBehaviour
@@ -15,6 +16,8 @@ public class DynamicGlowingOrbs : MonoBehaviour
     [SerializeField] private float _scaleFactor = 0.35f;
     [SerializeField] private LaunchEffect _launchEffect;
     //[SerializeField] [Range(0, 1)] private float _glowIntensity = 1.0f;
+
+    [SerializeField] private Light _light;
     
     [Header("Colors")] 
     [ColorUsageAttribute(true, true)] 
@@ -34,6 +37,7 @@ public class DynamicGlowingOrbs : MonoBehaviour
     void Start()
     {
         InitLists();
+        ResetOrbs();
         _material.SetInt("_NumberOfObjects", _objects.Count);
     }
 
@@ -46,7 +50,7 @@ public class DynamicGlowingOrbs : MonoBehaviour
 
     private void CheckForTouch()
     {
-        if (PlatformAgnosticInput.touchCount < 0) return;
+        if (PlatformAgnosticInput.touchCount <= 0) return;
         var touch = PlatformAgnosticInput.GetTouch(0);
         
         var touchPos = touch.position;
@@ -55,9 +59,11 @@ public class DynamicGlowingOrbs : MonoBehaviour
         
         if (touch.phase == TouchPhase.Began)
         {
+            Debug.Log($"Light enabled?: {_light.enabled}");
+            
             _launchEffect.Init(launchEffectPos);
             var launchDistance = 1f;
-            var magnitude = 1f; // update this to be proportional to the hold length on release
+            var magnitude = 0.5f; // update this to be proportional to the hold length on release
             var position = _mainCamera.ScreenToWorldPoint(new Vector3(touchPos.x, touchPos.y, launchDistance));
             var velocity = _mainCamera.transform.forward * magnitude;
             LaunchOrb(_currentBand, position, velocity);
@@ -72,8 +78,6 @@ public class DynamicGlowingOrbs : MonoBehaviour
 
     private void InitLists()
     {
-        ResetOrbs();
-        
         for (int i = 0; i < _objects.Count; i++)
         {
             var collider = _objects[i].GetComponent<SphereCollider>();
@@ -168,5 +172,10 @@ public class DynamicGlowingOrbs : MonoBehaviour
         _material.SetMatrixArray("_Rotations", rotationsArray);
         _material.SetColorArray("_Colors", colorsArray);
         _material.SetInt("_NumberOfObjects", _objects.Count);
+        
+        // manual override of lighting uniforms to fix bug on iOS build
+        Vector3 lightVector = _light.transform.rotation * Vector3.forward;
+        _material.SetVector("_LightPos", -lightVector);
+        _material.SetColor("_LightCol", _light.color);
     }
 }

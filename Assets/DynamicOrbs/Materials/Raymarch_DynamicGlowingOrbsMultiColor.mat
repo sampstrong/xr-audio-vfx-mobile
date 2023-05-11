@@ -26,6 +26,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _AmbientLight: 0.21
     - _FresnelIntensity: 0.85
     - _FresnelRamp: 0.77
     - _Gloss: 2

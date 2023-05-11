@@ -5,7 +5,10 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/MainScene.unity
     guid: 151299e0fc5d94aeea21892aea500835
+  - enabled: 1
+    path: Assets/Scenes/LOAK-Hackathon.unity
+    guid: 217cb244a99924327b64005ee4f9087a
   m_configObjects: {}

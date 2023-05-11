@@ -58,6 +58,7 @@ public class Orb : MonoBehaviour
         if (_orbState == OrbState.Disabled) return;
         UpdateIntensity();
         UpdateRigidbodies();
+        UpdateScale();
     }
 
     public void InitOrb(Vector3 origin, Vector3 position, Vector3 velocity, OrbFrequency freq)
@@ -155,6 +156,12 @@ public class Orb : MonoBehaviour
     }
 
    
+    private void UpdateScale()
+    {
+        var dist = Vector3.Distance(transform.position, _origin);
+        var scale = Mathf.Clamp((_xBounds / 2.0f) / dist, _minScale, _maxScale);
 
+        transform.localScale = _baseScale * scale;
+    }
    
 }
