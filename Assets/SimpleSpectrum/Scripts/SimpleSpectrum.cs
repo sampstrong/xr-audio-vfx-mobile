@@ -321,7 +321,7 @@ public class SimpleSpectrum : MonoBehaviour {
             Renderer rend = barClone.transform.GetChild(0).GetComponent<Renderer>();
             if (rend != null)
             {
-                barMaterials[i] = rend.material;
+                barMaterials[i] = rend.sharedMaterial;
             }
             else
             {

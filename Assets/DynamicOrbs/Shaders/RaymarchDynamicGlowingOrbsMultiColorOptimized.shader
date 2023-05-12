@@ -50,7 +50,7 @@ Shader "Raymarch/DynamicGlowingOrbsMultiColorOptimized"
 			// #define SURF_DIST 1e-3 // 0.001
 
             // new optimized values
-            #define MAX_STEPS 35
+            #define MAX_STEPS 30
 			#define MAX_DIST 15
 			#define SURF_DIST 1e-2 // 0.01
 
@@ -117,45 +117,45 @@ Shader "Raymarch/DynamicGlowingOrbsMultiColorOptimized"
 
             // ------ lighting ------
             
-            float3 getDiffuseLight(float3 normal)
+            float3 diff(float3 n)
             {
-            	float3 lightDir = _MainLightPos;
-            	float3 lightColor = _MainLightColor;
-                float lightFalloff = max(0, dot(lightDir, normal));
-                float3 directDiffuseLight = lightColor * lightFalloff;
+            	float3 ld = _MainLightPos;
+            	float3 lc = _MainLightColor;
+                float lf = max(0, dot(ld, n));
+                float3 d = lc * lf;
 
-                return directDiffuseLight;
+                return d;
             }
 
-            float3 getAmbientLight(float3 normal)
+            float3 amb(float3 n)
             {
             	float3 a = _AmbientLight;
                 return a;
             }
 
-            float3 getSpecularLight(float3 normal, float3 worldPos)
+            float3 spec(float3 n, float3 wp)
             {
-                float3 camPos = _WorldSpaceCameraPos;
-                float3 fragToCam = camPos - worldPos;
-                float3 viewDir = normalize(fragToCam);
-                float3 viewReflect = reflect(-viewDir, normal);
+                float3 c = _WorldSpaceCameraPos;
+                float3 f = c - wp;
+                float3 vd = normalize(f);
+                float3 vr = reflect(-vd, n);
             	
-            	float specularFalloff = max(0, dot(viewReflect, _MainLightPos));
-                specularFalloff = pow(specularFalloff, GLOSS);
+            	float s = max(0, dot(vr, _MainLightPos));
+                s = pow(s, GLOSS);
 
-                return specularFalloff;
+                return s;
             }
 
-            float3 applyLighting(float3 normal, float3 worldPos)
+            float3 light(float3 n, float3 wp)
             {
-	            float3 diffuse = getDiffuseLight(normal);
-                float3 ambient = getAmbientLight(normal);
-                float3 specular = getSpecularLight(normal, worldPos);
-            	float3 directSpecular = specular * _MainLightColor;
-                float3 diffuseLight = ambient + diffuse;
-                float3 finalSurfaceColor = diffuseLight * _BaseColor.rgb + directSpecular;
+	            float3 d = diff(n);
+                float3 a = amb(n);
+                float3 s = spec(n, wp);
+            	float3 ds = s * _MainLightColor;
+                float3 dl = a + d;
+                float3 l = dl * _BaseColor.rgb + ds;
 
-            	return finalSurfaceColor;
+            	return l;
             }
 
 
@@ -163,35 +163,35 @@ Shader "Raymarch/DynamicGlowingOrbsMultiColorOptimized"
             // ------ distance functions ------
 
             
-            float sphere(float3 p, float r, float3 worldPos)
+            float sphere(float3 p, float r, float3 wp)
             {
-				p -= worldPos;
+				p -= wp;
             	
 	            float d = length(p) - r;
             	return d;
             }
 
-            float gyroid(float3 p, float3 worldPos)
+            float gyroid(float3 p, float3 wp)
             {
-				p -= worldPos;
+				p -= wp;
             	
-            	float rescaleFactor = GYROID_SCALE;
-	            p *= rescaleFactor;
+            	float r = GYROID_SCALE;
+	            p *= r;
             	// float thickness = (sin(_Time.y * 0.5) * 0.5 + 0.5) * _GyroidThickness;
             	float thickness = _GyroidThickness;
 
 				p.y += _Time.y; // animate
             	
-            	float gyroid = abs(0.7 * dot(sin(p), cos(p.yzx)) / rescaleFactor) - thickness;
+            	float gyroid = abs(0.7 * dot(sin(p), cos(p.yzx)) / r) - thickness;
             	
             	return gyroid;
             }
             
 
-            float ballGyroidHollowUniversal(float3 p, float r, float3 worldPos)
+            float sGyroid(float3 p, float r, float3 wp)
             {
 	            // sphere shell gyroid
-            	float s = sphere(p, r, worldPos);
+            	float s = sphere(p, r, wp);
             	s = abs(s) - _GyroidThickness;
 				float g = gyroid(p, float3(0,0,0));
             	float k = _GyroidSmoothAmount;
@@ -201,13 +201,13 @@ Shader "Raymarch/DynamicGlowingOrbsMultiColorOptimized"
             }
             
 
-			float orb(float3 p, float r, float3 worldPos)
+			float orb(float3 p, float r, float3 wp)
             {
 	            // main sphere
-            	float d = sphere(p, r, worldPos);
+            	float d = sphere(p, r, wp);
 
             	// gyroid ridges
-            	float s = ballGyroidHollowUniversal(p, r, worldPos);
+            	float s = sGyroid(p, r, wp);
 
             	// combined
             	float k = _GyroidSmoothAmount;
@@ -220,10 +220,10 @@ Shader "Raymarch/DynamicGlowingOrbsMultiColorOptimized"
                         
 			// ------ raymarching ------
 
-			float4 getDistColor(float3 p)
+			float4 dist(float3 p)
             {
             	float4 d = 0.0;
-            	float4 lastDist = 0.0;
+            	float4 ld = 0.0;
 	   
             	if (_NumberOfObjects <= 0) return 1.0;
             	
@@ -232,24 +232,24 @@ Shader "Raymarch/DynamicGlowingOrbsMultiColorOptimized"
             		float4 s = float4(_Colors[i].rgb, orb(p, _Sizes[i], _Positions[i].xyz));
 					if (i == 0)
 					{
-						lastDist = s;
+						ld = s;
 						continue;
 					}
 	   
-            		d = sminColor(lastDist, s, SMOOTH);
-            		lastDist = d;
+            		d = sminColor(ld, s, SMOOTH);
+            		ld = d;
             	}
             	
 				return d;
 			}
             
 
-            float4 rayMarchColor(float3 ro, float3 rd) {
+            float4 march(float3 ro, float3 rd) {
 				float4 dO = 0;
 				float4 dS;
 				for (int i = 0; i < MAX_STEPS; i++) {
 					float3 p = ro + rd * dO.w;
-					dS = getDistColor(p);
+					dS = dist(p);
 					dO += dS;
 					if (dS.w<SURF_DIST || dO.w>MAX_DIST) break;
 				}
@@ -257,40 +257,40 @@ Shader "Raymarch/DynamicGlowingOrbsMultiColorOptimized"
 			}
             
 
-            float getFresnel(float3 normal, float3 rd)
+            float fres(float3 n, float3 rd)
             {
-				float3 viewDir = normalize(rd);
+				float3 vd = normalize(rd);
             	
-	            float fresnelAmount = 1 - max(0.0, dot(normal, viewDir));
-                fresnelAmount = pow(fresnelAmount, F_RAMP) * F_INTENSITY;
+	            float f = 1 - max(0.0, dot(n, vd));
+                f = pow(f, F_RAMP) * F_INTENSITY;
 
-            	return fresnelAmount;
+            	return f;
             }
 
-			float3 getNormal(float3 p) {
+			float3 norm(float3 p) {
 				float2 e = float2(1e-2, 0);
 
-				float3 n = getDistColor(p).w - float3(
-					getDistColor(p-e.xyy).w,
-					getDistColor(p-e.yxy).w,
-					getDistColor(p-e.yyx).w
+				float3 n = dist(p).w - float3(
+					dist(p-e.xyy).w,
+					dist(p-e.yxy).w,
+					dist(p-e.yyx).w
 				);
 
 				return normalize(n);
 			}
 
 			
-            float subSurfaceScattering(float3 p, float3 n, float3 ro)
+            float sss(float3 p, float3 n, float3 ro)
             {
-            	float f = getFresnel(n, ro);
-            	float sss = smoothstep(0.7, 0.0, f);
+            	float f = fres(n, ro);
+            	float s = smoothstep(0.7, 0.0, f);
 
                 float b = gyroid(p, float3(0,0,0));
-                sss *= smoothstep(0.0, 0.2, b);
-            	float s = abs(sin(p.z * 50 + _Time.y * 2.0));
-            	sss *= smoothstep(-0.5, 1, s);
+                s *= smoothstep(0.0, 0.2, b);
+            	float w = abs(sin(p.z * 50 + _Time.y * 2.0));
+            	s *= smoothstep(-0.5, 1, w);
             	
-            	return sss;
+            	return s;
             }
 
 
@@ -302,19 +302,20 @@ Shader "Raymarch/DynamicGlowingOrbsMultiColorOptimized"
             	
                 fixed4 col = 0;
 
-            	float4 d = rayMarchColor(ro, rd);
+            	float4 d = march(ro, rd);
 
                 if (d.w < MAX_DIST)
                 {
                     float3 p = ro + rd * d.w;
-                    float3 n = getNormal(p);
-					float3 l = applyLighting(n, p);
+                    float3 n = norm(p);
+					float3 l = light(n, p);
+                	// float3 l = getDiffuseLight(n); // option for better performance
                 	
 					// sub surface scattering
-					float sss = subSurfaceScattering(p, n, ro - p);
+					float s = sss(p, n, ro - p);
                 	
                     col.rgb = l * _BaseColor;
-                	col.rgb += sss * d.rgb;
+                	col.rgb += s * d.rgb;
                 }
                 else
                 {
