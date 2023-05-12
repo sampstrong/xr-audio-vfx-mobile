@@ -31,14 +31,6 @@ public class BandSelector : MonoBehaviour
         ChangeColor(_orbs.Colors[_currentBand - 1]);
     }
 
-    [Button]
-    private void ChangeColor(Color color)
-    {
-        _spectrum.colorMin = color;
-        _spectrum.colorMax = color * 2f;
-        _spectrum.RebuildSpectrum();
-    }
-
     private void Update()
     {
         IsPointerOverUIElement();
@@ -105,6 +97,19 @@ public class BandSelector : MonoBehaviour
             _launchEffect.SetColor(_orbs.Colors[nonUserBandIndex]);
             
         }
+    }
+    
+    [Button]
+    private void ChangeColor(Color color)
+    {
+        // _spectrum.colorMin = color;
+        // _spectrum.colorMax = color * 2f;
+        // _spectrum.RebuildSpectrum();
+
+        var colorLow = color;
+        var colorHigh = color * 2f;
+        
+        _spectrum.SetNewColor(colorLow, colorHigh);
     }
     
 }

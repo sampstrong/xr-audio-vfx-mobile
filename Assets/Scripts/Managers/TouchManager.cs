@@ -111,6 +111,8 @@ public class TouchManager : MonoBehaviour
 
     private void OnGUI()
     {
+        if (_guiZone == TouchZone.None) return;
+        
         switch (_guiZone)
         {
             case TouchZone.Top:

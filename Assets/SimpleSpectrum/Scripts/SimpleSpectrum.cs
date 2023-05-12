@@ -230,6 +230,8 @@ public class SimpleSpectrum : MonoBehaviour {
     float[] oldYScales; //also optimisation
     float[] oldColorValues; //...optimisation
     int materialValId;
+    
+    
 
     bool materialColourCanBeUsed = true; //can dynamic material colouring be used?
 
@@ -351,6 +353,16 @@ public class SimpleSpectrum : MonoBehaviour {
 
 
         isEnabled = true;
+    }
+
+    public void SetNewColor(Color colorLow, Color colorHigh)
+    {
+        foreach (var mat in barMaterials)
+        {
+            int color1Id = Shader.PropertyToID("_Color1"), color2Id = Shader.PropertyToID("_Color2");
+            mat.SetColor(color1Id, colorLow);
+            mat.SetColor(color2Id, colorHigh);
+        }
     }
 
     /// <summary>

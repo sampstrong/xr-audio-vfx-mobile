@@ -176,15 +176,15 @@ public class DynamicGlowingOrbs : MonoBehaviour
         _material.SetColorArray("_Colors", colorsArray);
         _material.SetInt("_NumberOfObjects", _objects.Count);
         
+        
+        // commented to reduce the amount of data passed to GPU each frame
+        // handled internally within shader
+        
         // manual override of lighting uniforms to fix bug on iOS build
-        Vector3 lightVector = _light.transform.rotation * Vector3.forward;
-        _material.SetVector("_LightPos", -lightVector);
-        _material.SetColor("_LightCol", _light.color);
-        
-        //0.04 is a good value 
-        //_material.SetFloat("_GyroidSmoothAmount", Mathf.Sin(Time.unscaledTime) * 0.04f);
-        
-        _material.SetFloat("_GyroidThickness", (Mathf.Sin(Time.unscaledTime * 0.5f) * 0.5f + 0.5f) * 0.1f);
+        // Vector3 lightVector = _light.transform.rotation * Vector3.forward;
+        // _material.SetVector("_LightPos", -lightVector);
+        // _material.SetColor("_LightCol", _light.color);
+        // _material.SetFloat("_GyroidThickness", (Mathf.Sin(Time.unscaledTime * 0.5f) * 0.5f + 0.5f) * 0.1f);
     }
 
     public void SetCurrentBand(int newBand)

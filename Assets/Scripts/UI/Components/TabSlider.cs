@@ -1,8 +1,5 @@
 using System.Collections;
-using System.Collections.Generic;
-using Mono.Cecil;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 public class TabSlider : MonoBehaviour
 {
