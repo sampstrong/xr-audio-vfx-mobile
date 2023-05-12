@@ -45,7 +45,6 @@ public class MenuController : MonoBehaviour
             if (page == _pageStack.Peek())
             {
                 PopPage();
-
                 return;
             }
         }
@@ -125,5 +124,13 @@ public class MenuController : MonoBehaviour
     public bool IsPageOnTopOfStack(Page page)
     {
         return _pageStack.Count > 0 && page == _pageStack.Peek();
+    }
+
+    public bool IsOnMainPage()
+    {
+        if (_pageStack.Peek() == _initialPage || _pageStack.Peek() == _startingOverlay)
+            return true;
+        else
+            return false;
     }
 }

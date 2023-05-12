@@ -7,12 +7,32 @@ public class LaunchEffect : MonoBehaviour
 {
     [SerializeField] private Renderer _renderer;
     [SerializeField] private VisualEffect[] _particleEffects;
-    
+    [SerializeField] private float _offset = 0.25f;
     private Vector3 _targetPos;
+    
 
-    public void Init(Vector3 targetPos)
+    private void Start()
     {
-        _targetPos = targetPos;
+        TouchManager.TouchStarted += Init;
+        TouchManager.TouchHappened += HandleTouch;
+        TouchManager.TouchEnded += Disable;
+    }
+
+    private void HandleTouch(Touch touch, TouchManager.TouchZone zone)
+    {
+        if (zone != TouchManager.TouchZone.World) return;
+        
+        var targetPos = ServiceLocator.Instance.ARCamera.ScreenToWorldPoint(
+            new Vector3(touch.position.x, touch.position.y, _offset));
+        
+        SetTargetPos(targetPos);
+    }
+
+    
+    public void Init(Touch touch, TouchManager.TouchZone zone)
+    {
+        if (zone != TouchManager.TouchZone.World) return;
+        
         _renderer.enabled = true;
         foreach (var e in _particleEffects)
         {
@@ -20,7 +40,7 @@ public class LaunchEffect : MonoBehaviour
         }
     }
 
-    public void Disable()
+    public void Disable(Touch touch, TouchManager.TouchZone zone)
     {
         _renderer.enabled = false;
         foreach (var e in _particleEffects)

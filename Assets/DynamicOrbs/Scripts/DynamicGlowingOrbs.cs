@@ -1,10 +1,7 @@
 using System.Collections.Generic;
-using System.ComponentModel.Design;
 using Niantic.ARDK.Utilities.Input.Legacy;
 using Sirenix.OdinInspector;
-using Sirenix.Utilities;
 using UnityEngine;
-using UnityEngine.Experimental.GlobalIllumination;
 
 // [ExecuteInEditMode]
 public class DynamicGlowingOrbs : MonoBehaviour
@@ -41,41 +38,31 @@ public class DynamicGlowingOrbs : MonoBehaviour
         InitLists();
         ResetOrbs();
         _material.SetInt("_NumberOfObjects", _objects.Count);
+        TouchManager.TouchStarted += HandleTouchStarted;
+        TouchManager.TouchEnded += HandleTouchEnded;
     }
 
     void Update()
     {
         UpdateShaderUniforms();
-        CheckForTouch();
     }
-
-    private void CheckForTouch()
+    
+    private void HandleTouchStarted(Touch touch, TouchManager.TouchZone zone)
     {
-        if (PlatformAgnosticInput.touchCount <= 0) return;
-        var touch = PlatformAgnosticInput.GetTouch(0);
-
-        if (TouchManager.CurrentTouchZone != TouchManager.TouchZone.World) return;
+        if (zone != TouchManager.TouchZone.World) return;
         
         var touchPos = touch.position;
-        var launchEffectPos = _mainCamera.ScreenToWorldPoint(new Vector3(touchPos.x, touchPos.y, 0.25f));
-        _launchEffect.SetTargetPos(launchEffectPos);
-        
-        if (touch.phase == TouchPhase.Began)
-        {
-            _launchEffect.Init(launchEffectPos);
-            var launchDistance = 3f;
-            var magnitude = 0.5f; // update this to be proportional to the hold length on release
-            var position = _mainCamera.ScreenToWorldPoint(new Vector3(touchPos.x, touchPos.y, launchDistance));
-            var velocity = _mainCamera.transform.forward * magnitude;
-            LaunchOrb(_currentBand, position, velocity);
-        }
-        else if (touch.phase == TouchPhase.Ended)
-        {
-            _launchEffect.Disable();
-        }
+        var launchDistance = 3f;
+        var magnitude = 0.5f; // update this to be proportional to the hold length on release
+        var position = _mainCamera.ScreenToWorldPoint(new Vector3(touchPos.x, touchPos.y, launchDistance));
+        var velocity = _mainCamera.transform.forward * magnitude;
+        LaunchOrb(_currentBand, position, velocity);
     }
     
-    
+    private void HandleTouchEnded(Touch touch, TouchManager.TouchZone zone)
+    {
+        // launch at end of touch instead
+    }
 
     private void InitLists()
     {
@@ -172,7 +159,7 @@ public class DynamicGlowingOrbs : MonoBehaviour
 
         _material.SetVectorArray("_Positions", posistionsArray);
         _material.SetFloatArray("_Sizes", sizesArray);
-        _material.SetMatrixArray("_Rotations", rotationsArray);
+        
         _material.SetColorArray("_Colors", colorsArray);
         _material.SetInt("_NumberOfObjects", _objects.Count);
         
@@ -185,6 +172,8 @@ public class DynamicGlowingOrbs : MonoBehaviour
         // _material.SetVector("_LightPos", -lightVector);
         // _material.SetColor("_LightCol", _light.color);
         // _material.SetFloat("_GyroidThickness", (Mathf.Sin(Time.unscaledTime * 0.5f) * 0.5f + 0.5f) * 0.1f);
+        
+        // _material.SetMatrixArray("_Rotations", rotationsArray);
     }
 
     public void SetCurrentBand(int newBand)

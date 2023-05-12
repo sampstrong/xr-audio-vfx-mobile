@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using TMPro;
@@ -26,8 +27,9 @@ public class BandSelector : MonoBehaviour
     private int _currentBand = 1;
     private int _currentBandLast = 1;
 
-    private void Start()
+    private IEnumerator Start()
     {
+        yield return new WaitForSeconds(1f);
         ChangeColor(_orbs.Colors[_currentBand - 1]);
     }
 

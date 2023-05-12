@@ -582,8 +582,9 @@ public class SimpleSpectrum : MonoBehaviour {
                 bar.localScale = Vector3.Lerp(bar.localScale, new Vector3(1, barMinYScale, 1), decayDamp);
 			}
 		}
-        if ((Time.unscaledTime - lastMicRestartTime)>micRestartWait)
-            RestartMicrophone();
+        // testing removing this is its very performance heavy
+        //if ((Time.unscaledTime - lastMicRestartTime)>micRestartWait)
+        //    RestartMicrophone();
 	}
 
     /// <summary>

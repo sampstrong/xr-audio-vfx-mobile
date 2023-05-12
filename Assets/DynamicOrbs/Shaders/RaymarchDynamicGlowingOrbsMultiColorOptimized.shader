@@ -51,7 +51,7 @@ Shader "Raymarch/DynamicGlowingOrbsMultiColorOptimized"
 
             // new optimized values
             #define MAX_STEPS 35
-			#define MAX_DIST 20
+			#define MAX_DIST 15
 			#define SURF_DIST 1e-2 // 0.01
 
             // constant values for optimization
@@ -98,7 +98,7 @@ Shader "Raymarch/DynamicGlowingOrbsMultiColorOptimized"
             uniform int _NumberOfObjects;
             uniform float4 _Positions[8];
             uniform float _Sizes[8];
-            uniform float4x4 _Rotations[8];
+            // uniform float4x4 _Rotations[8];
             uniform fixed4 _Colors[8];
 
             // uniform float4 _LightPos;
@@ -163,19 +163,17 @@ Shader "Raymarch/DynamicGlowingOrbsMultiColorOptimized"
             // ------ distance functions ------
 
             
-            float sphere(float3 p, float r, float3 worldPos, float4x4 rotMatrix)
+            float sphere(float3 p, float r, float3 worldPos)
             {
 				p -= worldPos;
-            	p = mul(p, rotMatrix);
             	
 	            float d = length(p) - r;
             	return d;
             }
 
-            float gyroid(float3 p, float3 worldPos, float4x4 rotMatrix)
+            float gyroid(float3 p, float3 worldPos)
             {
 				p -= worldPos;
-            	p = mul(p, rotMatrix);
             	
             	float rescaleFactor = GYROID_SCALE;
 	            p *= rescaleFactor;
@@ -190,12 +188,12 @@ Shader "Raymarch/DynamicGlowingOrbsMultiColorOptimized"
             }
             
 
-            float ballGyroidHollowUniversal(float3 p, float r, float3 worldPos, float4x4 rotMatrix)
+            float ballGyroidHollowUniversal(float3 p, float r, float3 worldPos)
             {
 	            // sphere shell gyroid
-            	float s = sphere(p, r, worldPos, rotMatrix);
+            	float s = sphere(p, r, worldPos);
             	s = abs(s) - _GyroidThickness;
-				float g = gyroid(p, float3(0,0,0), _Rotations[0]);
+				float g = gyroid(p, float3(0,0,0));
             	float k = _GyroidSmoothAmount;
             	s = smin(s, g, -k);
 
@@ -203,13 +201,13 @@ Shader "Raymarch/DynamicGlowingOrbsMultiColorOptimized"
             }
             
 
-			float orb(float3 p, float r, float3 worldPos, float4x4 rotMatrix)
+			float orb(float3 p, float r, float3 worldPos)
             {
 	            // main sphere
-            	float d = sphere(p, r, worldPos, rotMatrix);
+            	float d = sphere(p, r, worldPos);
 
             	// gyroid ridges
-            	float s = ballGyroidHollowUniversal(p, r, worldPos, _Rotations[0]);
+            	float s = ballGyroidHollowUniversal(p, r, worldPos);
 
             	// combined
             	float k = _GyroidSmoothAmount;
@@ -231,7 +229,7 @@ Shader "Raymarch/DynamicGlowingOrbsMultiColorOptimized"
             	
             	for (int i = 0; i < _NumberOfObjects; i++)
             	{
-            		float4 s = float4(_Colors[i].rgb, orb(p, _Sizes[i], _Positions[i].xyz, _Rotations[i]));
+            		float4 s = float4(_Colors[i].rgb, orb(p, _Sizes[i], _Positions[i].xyz));
 					if (i == 0)
 					{
 						lastDist = s;
@@ -287,7 +285,7 @@ Shader "Raymarch/DynamicGlowingOrbsMultiColorOptimized"
             	float f = getFresnel(n, ro);
             	float sss = smoothstep(0.7, 0.0, f);
 
-                float b = gyroid(p, float3(0,0,0), _Rotations[0]);
+                float b = gyroid(p, float3(0,0,0));
                 sss *= smoothstep(0.0, 0.2, b);
             	float s = abs(sin(p.z * 50 + _Time.y * 2.0));
             	sss *= smoothstep(-0.5, 1, s);
@@ -312,23 +310,11 @@ Shader "Raymarch/DynamicGlowingOrbsMultiColorOptimized"
                     float3 n = getNormal(p);
 					float3 l = applyLighting(n, p);
                 	
-                	// update transforms
-                	// p -= _Positions[0];
-                	float3 pRot = mul(p, _Rotations[0]);
-                	
 					// sub surface scattering
 					float sss = subSurfaceScattering(p, n, ro - p);
                 	
-                	
                     col.rgb = l * _BaseColor;
-                	// col.rgb += sss * (_GlowColor * _Intensity);
                 	col.rgb += sss * d.rgb;
-
-                	// surface dots
-                	// float noise = 1.0 - clamp(snoise(pRot * _NoiseScale), 0.6, 0.8);
-                	// noise = lerp(noise, 0.5, clamp(1.0 - _GlowColor.r * sss, 0.0, 1.0));
-                	// col.rgb *= noise;
-
                 }
                 else
                 {

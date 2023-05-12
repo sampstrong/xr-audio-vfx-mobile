@@ -17,8 +17,8 @@ public class TouchManager : MonoBehaviour
         Top = 4
     }
     private static TouchZone _touchZone = TouchZone.None;
-    
 
+    [SerializeField] private MenuController _menuController;
     [SerializeField] private bool _spectrum = true;
     [SerializeField] private TouchZone _guiZone;
 
@@ -42,7 +42,10 @@ public class TouchManager : MonoBehaviour
     private int _spectrumThreshold;
     private int _bottomThreshold;
 
-    public event Action<TouchZone> TouchHappened; 
+    public static event Action<Touch, TouchZone> TouchStarted;
+    public static event Action<Touch, TouchZone> TouchEnded;
+
+    public static event Action<Touch, TouchZone> TouchHappened;
 
 
     private void Update()
@@ -85,6 +88,12 @@ public class TouchManager : MonoBehaviour
                 // Debug.Log(TouchZone.None);
                 break;
         }
+
+        if (!_menuController.IsOnMainPage()) return;
+        
+        TouchHappened?.Invoke(touch0, _touchZone);
+        if (touch0.phase == TouchPhase.Began) TouchStarted?.Invoke(touch0, _touchZone);
+        else if (touch0.phase == TouchPhase.Ended) TouchEnded?.Invoke(touch0, _touchZone);
     }
     
     public static TouchZone GetCurrentTouchZone()
