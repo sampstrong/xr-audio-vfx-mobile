@@ -46,6 +46,7 @@ public class TouchManager : MonoBehaviour
     public static event Action<Touch, TouchZone> TouchEnded;
 
     public static event Action<Touch, TouchZone> TouchHappened;
+    public static event Action<Touch, TouchZone> MultiTouchHappened;
 
 
     private void Update()
@@ -62,6 +63,8 @@ public class TouchManager : MonoBehaviour
         _isTouching = true;
         _touchPos = touch0.position;
 
+        // _touchZone = FindCurrentZone(touch0);
+        
         switch (touch0.position.y)
         {
             case var condition when touch0.position.y > Screen.height - _topThreshold:
@@ -69,17 +72,17 @@ public class TouchManager : MonoBehaviour
                 // Debug.Log(TouchZone.Top);
                 break;
             case var condition when touch0.position.y > Screen.height - _worldThresholdWithSpectrum && 
-                                         touch0.position.y < Screen.height - _topThreshold:
+                                    touch0.position.y < Screen.height - _topThreshold:
                 _touchZone = TouchZone.World;
                 // Debug.Log(TouchZone.World);
                 break;
             case var condition when touch0.position.y > Screen.height - _spectrumThreshold && 
-                                         touch0.position.y < Screen.height - _worldThresholdWithSpectrum:
+                                    touch0.position.y < Screen.height - _worldThresholdWithSpectrum:
                 _touchZone = TouchZone.Spectrum;
                 // Debug.Log(TouchZone.Spectrum);
                 break;
             case var condition when touch0.position.y > Screen.height - _bottomThreshold && 
-                                         touch0.position.y < Screen.height - _spectrumThreshold:
+                                    touch0.position.y < Screen.height - _spectrumThreshold:
                 _touchZone = TouchZone.Bottom;
                 // Debug.Log(TouchZone.Bottom);
                 break;
@@ -94,6 +97,46 @@ public class TouchManager : MonoBehaviour
         TouchHappened?.Invoke(touch0, _touchZone);
         if (touch0.phase == TouchPhase.Began) TouchStarted?.Invoke(touch0, _touchZone);
         else if (touch0.phase == TouchPhase.Ended) TouchEnded?.Invoke(touch0, _touchZone);
+
+        if (PlatformAgnosticInput.touchCount >= 2)
+        {
+            var touch1 = PlatformAgnosticInput.GetTouch(1);
+            MultiTouchHappened?.Invoke(touch1, _touchZone);
+        }
+    }
+
+    private TouchZone FindCurrentZone(Touch touch)
+    {
+        TouchZone zone;
+        
+        switch (touch.position.y)
+        {
+            case var condition when touch.position.y > Screen.height - _topThreshold:
+                zone = TouchZone.Top;
+                // Debug.Log(TouchZone.Top);
+                break;
+            case var condition when touch.position.y > Screen.height - _worldThresholdWithSpectrum && 
+                                    touch.position.y < Screen.height - _topThreshold:
+                zone = TouchZone.World;
+                // Debug.Log(TouchZone.World);
+                break;
+            case var condition when touch.position.y > Screen.height - _spectrumThreshold && 
+                                    touch.position.y < Screen.height - _worldThresholdWithSpectrum:
+                zone = TouchZone.Spectrum;
+                // Debug.Log(TouchZone.Spectrum);
+                break;
+            case var condition when touch.position.y > Screen.height - _bottomThreshold && 
+                                    touch.position.y < Screen.height - _spectrumThreshold:
+                zone = TouchZone.Bottom;
+                // Debug.Log(TouchZone.Bottom);
+                break;
+            default:
+                zone = TouchZone.None;
+                // Debug.Log(TouchZone.None);
+                break;
+        }
+
+        return zone;
     }
     
     public static TouchZone GetCurrentTouchZone()

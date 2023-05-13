@@ -126,6 +126,8 @@ public class Orb : MonoBehaviour
 
     private void UpdateRigidbodies()
     {
+        transform.rotation = Quaternion.identity;
+        
         var p = _rigidBody.transform.position;
         var v = _rigidBody.velocity;
 

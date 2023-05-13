@@ -1,12 +1,13 @@
+using System;
 using System.Collections.Generic;
-using Niantic.ARDK.Utilities.Input.Legacy;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 // [ExecuteInEditMode]
-public class DynamicGlowingOrbs : MonoBehaviour
+public class OrbsGroup : MonoBehaviour
 {
     public List<Orb> Objects => _objects;
+    public List<Orb> EnabledOrbs => _enabledOrbs;
     public List<Color> Colors => _colors;
     
     [SerializeField] private Camera _mainCamera;
@@ -33,6 +34,16 @@ public class DynamicGlowingOrbs : MonoBehaviour
 
     private Vector3 _origin;
 
+    public enum OrbInteractionState
+    {
+        Create = 0,
+        Play = 1
+    }
+
+    public static OrbInteractionState InteractionState = OrbInteractionState.Create;
+
+    public static event Action<OrbInteractionState> InteractionStateChanged;
+
     void Start()
     {
         InitLists();
@@ -49,6 +60,7 @@ public class DynamicGlowingOrbs : MonoBehaviour
     
     private void HandleTouchStarted(Touch touch, TouchManager.TouchZone zone)
     {
+        if (InteractionState == OrbInteractionState.Play) return;
         if (zone != TouchManager.TouchZone.World) return;
         
         var touchPos = touch.position;
@@ -179,5 +191,11 @@ public class DynamicGlowingOrbs : MonoBehaviour
     public void SetCurrentBand(int newBand)
     {
         _currentBand = newBand;
+    }
+
+    public void ChangeState(int state)
+    {
+        InteractionState = (OrbInteractionState)state;
+        InteractionStateChanged?.Invoke(InteractionState);
     }
 }

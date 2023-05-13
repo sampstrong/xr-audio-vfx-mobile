@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Niantic.ARDK.Utilities.Input.Legacy;
 using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
@@ -12,7 +13,7 @@ using UnityEngine.EventSystems;
 /// </summary>
 public class BandSelector : MonoBehaviour
 {
-    [SerializeField] private DynamicGlowingOrbs _orbs;
+    [SerializeField] private OrbsGroup orbsGroup;
     [SerializeField] private LaunchEffect _launchEffect;
     [SerializeField] private SimpleSpectrum _spectrum;
     [SerializeField] private BandButton[] _bands = new BandButton[8];
@@ -30,7 +31,7 @@ public class BandSelector : MonoBehaviour
     private IEnumerator Start()
     {
         yield return new WaitForSeconds(1f);
-        ChangeColor(_orbs.Colors[_currentBand - 1]);
+        ChangeColor(orbsGroup.Colors[_currentBand - 1]);
     }
 
     private void Update()
@@ -79,7 +80,7 @@ public class BandSelector : MonoBehaviour
     static List<RaycastResult> GetEventSystemRaycastResults()
     {   
         PointerEventData eventData = new PointerEventData(EventSystem.current);
-        eventData.position =  Input.mousePosition;
+        eventData.position = PlatformAgnosticInput.GetTouch(0).position;
         List<RaycastResult> raysastResults = new List<RaycastResult>();
         EventSystem.current.RaycastAll( eventData, raysastResults );
         return raysastResults;
@@ -94,9 +95,9 @@ public class BandSelector : MonoBehaviour
 
             var nonUserBandIndex = _currentBand - 1;
             
-            ChangeColor(_orbs.Colors[nonUserBandIndex]);
-            _orbs.SetCurrentBand(nonUserBandIndex);
-            _launchEffect.SetColor(_orbs.Colors[nonUserBandIndex]);
+            ChangeColor(orbsGroup.Colors[nonUserBandIndex]);
+            orbsGroup.SetCurrentBand(nonUserBandIndex);
+            _launchEffect.SetColor(orbsGroup.Colors[nonUserBandIndex]);
             
         }
     }

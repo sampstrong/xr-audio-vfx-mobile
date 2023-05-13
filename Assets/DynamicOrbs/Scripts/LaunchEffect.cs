@@ -1,5 +1,5 @@
 using System.Collections;
-using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 using UnityEngine.VFX;
 
@@ -21,6 +21,7 @@ public class LaunchEffect : MonoBehaviour
     private void HandleTouch(Touch touch, TouchManager.TouchZone zone)
     {
         if (zone != TouchManager.TouchZone.World) return;
+        if (OrbsGroup.InteractionState == OrbsGroup.OrbInteractionState.Play) return;
         
         var targetPos = ServiceLocator.Instance.ARCamera.ScreenToWorldPoint(
             new Vector3(touch.position.x, touch.position.y, _offset));
@@ -32,6 +33,7 @@ public class LaunchEffect : MonoBehaviour
     public void Init(Touch touch, TouchManager.TouchZone zone)
     {
         if (zone != TouchManager.TouchZone.World) return;
+        if (OrbsGroup.InteractionState == OrbsGroup.OrbInteractionState.Play) return;
         
         _renderer.enabled = true;
         foreach (var e in _particleEffects)
