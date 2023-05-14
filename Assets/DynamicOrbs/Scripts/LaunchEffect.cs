@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
@@ -78,5 +79,23 @@ public class LaunchEffect : MonoBehaviour
         {
             e.SetVector4("_Color", color);
         }
+    }
+
+    private void OnDisable()
+    {
+        EndProcesses();
+    }
+
+    private void OnApplicationFocus(bool hasFocus)
+    {
+        if (!hasFocus)
+            EndProcesses();
+    }
+
+    private void EndProcesses()
+    {
+        TouchManager.TouchStarted -= Init;
+        TouchManager.TouchHappened -= HandleTouch;
+        TouchManager.TouchEnded -= Disable;
     }
 }

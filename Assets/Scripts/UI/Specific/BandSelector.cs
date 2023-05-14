@@ -36,6 +36,7 @@ public class BandSelector : MonoBehaviour
 
     private void Update()
     {
+        if (!TouchManager.IsTouching) return;
         IsPointerOverUIElement();
         UpdateCurrentBand();
     }
@@ -80,7 +81,12 @@ public class BandSelector : MonoBehaviour
     static List<RaycastResult> GetEventSystemRaycastResults()
     {   
         PointerEventData eventData = new PointerEventData(EventSystem.current);
-        eventData.position = PlatformAgnosticInput.GetTouch(0).position;
+
+        if (PlatformAgnosticInput.touchCount > 0)
+        {
+            eventData.position = PlatformAgnosticInput.GetTouch(0).position;
+        }
+        
         List<RaycastResult> raysastResults = new List<RaycastResult>();
         EventSystem.current.RaycastAll( eventData, raysastResults );
         return raysastResults;
@@ -105,10 +111,6 @@ public class BandSelector : MonoBehaviour
     [Button]
     private void ChangeColor(Color color)
     {
-        // _spectrum.colorMin = color;
-        // _spectrum.colorMax = color * 2f;
-        // _spectrum.RebuildSpectrum();
-
         var colorLow = color;
         var colorHigh = color * 2f;
         

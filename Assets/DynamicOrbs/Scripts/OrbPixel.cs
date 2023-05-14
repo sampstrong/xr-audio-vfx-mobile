@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -91,6 +92,8 @@ public class OrbPixel : MonoBehaviour
     {
         if (transform.parent)
             transform.parent.DetachChildren();
+
+        if (_orbsGroup.EnabledOrbs.Count <= 0) return;
         
         var index = Random.Range(0, _orbsGroup.EnabledOrbs.Count - 1);
         var newTarget = _orbsGroup.Objects[index];
@@ -116,5 +119,24 @@ public class OrbPixel : MonoBehaviour
         transform.position = target.transform.position;
         transform.localScale = target.transform.localScale / 2f;
         transform.parent = target.transform;
+    }
+
+    private void OnDisable()
+    {
+        EndProcesses();
+    }
+
+    private void OnApplicationFocus(bool hasFocus)
+    {
+        if (!hasFocus)
+            EndProcesses();
+    }
+
+    private void EndProcesses()
+    {
+        TouchManager.TouchStarted -= HandleTouchStarted;
+        TouchManager.MultiTouchHappened -= HandleMultiTouchHappened;
+        TouchManager.TouchEnded -= HandleTouchEnded;
+        OrbsGroup.InteractionStateChanged -= HandleInteractionChange;
     }
 }

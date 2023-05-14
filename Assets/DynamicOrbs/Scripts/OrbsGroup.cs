@@ -106,9 +106,6 @@ public class OrbsGroup : MonoBehaviour
         
         if (_disabledOrbs.Count > 0)
         {
-            // set origin of first orb
-            // if (_disabledOrbs.Count == _objects.Count)
-            //     _origin = pos + _mainCamera.transform.forward * 4f;
             // take from list of disabled orbs if there are any
             orb = _disabledOrbs[0];
             _disabledOrbs.Remove(orb);
@@ -166,7 +163,6 @@ public class OrbsGroup : MonoBehaviour
         
         var posistionsArray = _positions.ToArray();
         var sizesArray = _sizes.ToArray();
-        var rotationsArray = _rotationMatrices.ToArray();
         var colorsArray = _frequencyColors.ToArray();
 
         _material.SetVectorArray("_Positions", posistionsArray);
@@ -174,18 +170,6 @@ public class OrbsGroup : MonoBehaviour
         
         _material.SetColorArray("_Colors", colorsArray);
         _material.SetInt("_NumberOfObjects", _objects.Count);
-        
-        
-        // commented to reduce the amount of data passed to GPU each frame
-        // handled internally within shader
-        
-        // manual override of lighting uniforms to fix bug on iOS build
-        // Vector3 lightVector = _light.transform.rotation * Vector3.forward;
-        // _material.SetVector("_LightPos", -lightVector);
-        // _material.SetColor("_LightCol", _light.color);
-        // _material.SetFloat("_GyroidThickness", (Mathf.Sin(Time.unscaledTime * 0.5f) * 0.5f + 0.5f) * 0.1f);
-        
-        // _material.SetMatrixArray("_Rotations", rotationsArray);
     }
 
     public void SetCurrentBand(int newBand)
@@ -197,5 +181,30 @@ public class OrbsGroup : MonoBehaviour
     {
         InteractionState = (OrbInteractionState)state;
         InteractionStateChanged?.Invoke(InteractionState);
+    }
+
+    public void OnDestroy()
+    {
+        EndProcesses();
+    }
+
+    private void OnApplicationFocus(bool hasFocus)
+    {
+        if (!hasFocus)
+            EndProcesses();
+    }
+
+    private void EndProcesses()
+    {
+        TouchManager.TouchStarted -= HandleTouchStarted;
+        TouchManager.TouchEnded -= HandleTouchEnded;
+        ResetOrbs();
+    }
+
+    private void ResumeProcesses()
+    {
+        // will start be called again on resume?
+        // TouchManager.TouchStarted += HandleTouchStarted;
+        // TouchManager.TouchEnded += HandleTouchEnded;
     }
 }

@@ -53,6 +53,7 @@ public class TouchManager : MonoBehaviour
     {
         SetTouchZones();
 
+        // change touch count to switch statement
         if (PlatformAgnosticInput.touchCount <= 0)
         {
             _isTouching = false;

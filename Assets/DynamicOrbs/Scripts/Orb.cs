@@ -80,7 +80,6 @@ public class Orb : MonoBehaviour
         transform.position = position;
         _rigidBody.velocity = velocity;
         _orbFrequency = freq;
-        // _origin = origin;
         _origin = origin;
         SetLocalBounds(_origin);
     }
@@ -204,4 +203,6 @@ public class Orb : MonoBehaviour
     {
         _rigidBody.velocity = -_rigidBody.velocity;
     }
+
+    
 }
