@@ -10,7 +10,6 @@ public class OrbsGroup : MonoBehaviour
     public List<Orb> EnabledOrbs => _enabledOrbs;
     public List<Color> Colors => _colors;
     
-    [SerializeField] private Camera _mainCamera;
     [SerializeField] private int _currentBand;
     [SerializeField] private Material _material;
     [SerializeField] private List<Orb> _objects = new List<Orb>();
@@ -34,6 +33,8 @@ public class OrbsGroup : MonoBehaviour
 
     private Vector3 _origin;
 
+    private ServiceLocator _locator;
+
     public enum OrbInteractionState
     {
         Create = 0,
@@ -48,6 +49,7 @@ public class OrbsGroup : MonoBehaviour
     {
         InitLists();
         ResetOrbs();
+        _locator = ServiceLocator.Instance;
         _material.SetInt("_NumberOfObjects", _objects.Count);
         TouchManager.TouchStarted += HandleTouchStarted;
         TouchManager.TouchEnded += HandleTouchEnded;
@@ -66,8 +68,8 @@ public class OrbsGroup : MonoBehaviour
         var touchPos = touch.position;
         var launchDistance = 3f;
         var magnitude = 0.5f; // update this to be proportional to the hold length on release
-        var position = _mainCamera.ScreenToWorldPoint(new Vector3(touchPos.x, touchPos.y, launchDistance));
-        var velocity = _mainCamera.transform.forward * magnitude;
+        var position = _locator.ARCamera.ScreenToWorldPoint(new Vector3(touchPos.x, touchPos.y, launchDistance));
+        var velocity = _locator.ARCamera.transform.forward * magnitude;
         LaunchOrb(_currentBand, position, velocity);
     }
     
