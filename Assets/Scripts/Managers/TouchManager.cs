@@ -96,7 +96,10 @@ public class TouchManager : MonoBehaviour
         if (!_menuController.IsOnMainPage()) return;
         
         TouchHappened?.Invoke(touch0, _touchZone);
-        if (touch0.phase == TouchPhase.Began) TouchStarted?.Invoke(touch0, _touchZone);
+        if (touch0.phase == TouchPhase.Began)
+        {
+            TouchStarted?.Invoke(touch0, _touchZone);
+        }
         else if (touch0.phase == TouchPhase.Ended) TouchEnded?.Invoke(touch0, _touchZone);
 
         if (PlatformAgnosticInput.touchCount >= 2)

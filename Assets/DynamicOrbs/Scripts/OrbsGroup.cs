@@ -70,6 +70,7 @@ public class OrbsGroup : MonoBehaviour
         var magnitude = 0.5f; // update this to be proportional to the hold length on release
         var position = _locator.ARCamera.ScreenToWorldPoint(new Vector3(touchPos.x, touchPos.y, launchDistance));
         var velocity = _locator.ARCamera.transform.forward * magnitude;
+        
         LaunchOrb(_currentBand, position, velocity);
     }
     
@@ -132,7 +133,9 @@ public class OrbsGroup : MonoBehaviour
     [Button]
     private void ResetOrbs()
     {
+        _frequencyColors.Clear();
         _frequencyColors.AddRange(_colors);
+        _disabledOrbs.Clear();
         _disabledOrbs.AddRange(_objects);
         _enabledOrbs.Clear();
 
@@ -194,6 +197,8 @@ public class OrbsGroup : MonoBehaviour
     {
         if (!hasFocus)
             EndProcesses();
+        else
+            ResumeProcesses();
     }
 
     private void EndProcesses()
@@ -205,8 +210,7 @@ public class OrbsGroup : MonoBehaviour
 
     private void ResumeProcesses()
     {
-        // will start be called again on resume?
-        // TouchManager.TouchStarted += HandleTouchStarted;
-        // TouchManager.TouchEnded += HandleTouchEnded;
+        TouchManager.TouchStarted += HandleTouchStarted;
+        TouchManager.TouchEnded += HandleTouchEnded;
     }
 }

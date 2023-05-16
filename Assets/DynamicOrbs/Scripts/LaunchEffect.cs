@@ -10,10 +10,13 @@ public class LaunchEffect : MonoBehaviour
     [SerializeField] private VisualEffect[] _particleEffects;
     [SerializeField] private float _offset = 0.25f;
     private Vector3 _targetPos;
+
+    private ServiceLocator _locator;
     
 
     private void Start()
     {
+        _locator = ServiceLocator.Instance;
         TouchManager.TouchStarted += Init;
         TouchManager.TouchHappened += HandleTouch;
         TouchManager.TouchEnded += Disable;
@@ -90,6 +93,8 @@ public class LaunchEffect : MonoBehaviour
     {
         if (!hasFocus)
             EndProcesses();
+        else
+            ResumeProcesses();
     }
 
     private void EndProcesses()
@@ -97,5 +102,12 @@ public class LaunchEffect : MonoBehaviour
         TouchManager.TouchStarted -= Init;
         TouchManager.TouchHappened -= HandleTouch;
         TouchManager.TouchEnded -= Disable;
+    }
+
+    private void ResumeProcesses()
+    {
+        TouchManager.TouchStarted += Init;
+        TouchManager.TouchHappened += HandleTouch;
+        TouchManager.TouchEnded += Disable;
     }
 }

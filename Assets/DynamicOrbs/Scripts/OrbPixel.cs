@@ -13,12 +13,14 @@ public class OrbPixel : MonoBehaviour
 
     private float _randomOffset;
     private bool _randomized;
+    private ServiceLocator _locator;
 
     private float _shiftTimer = 0f;
 
     private void Start()
     {
         Disable();
+        _locator = ServiceLocator.Instance;
         TouchManager.TouchStarted += HandleTouchStarted;
         TouchManager.MultiTouchHappened += HandleMultiTouchHappened;
         TouchManager.TouchEnded += HandleTouchEnded;
@@ -138,5 +140,13 @@ public class OrbPixel : MonoBehaviour
         TouchManager.MultiTouchHappened -= HandleMultiTouchHappened;
         TouchManager.TouchEnded -= HandleTouchEnded;
         OrbsGroup.InteractionStateChanged -= HandleInteractionChange;
+    }
+
+    private void ResumeProcesses()
+    {
+        TouchManager.TouchStarted += HandleTouchStarted;
+        TouchManager.MultiTouchHappened += HandleMultiTouchHappened;
+        TouchManager.TouchEnded += HandleTouchEnded;
+        OrbsGroup.InteractionStateChanged += HandleInteractionChange;
     }
 }

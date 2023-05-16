@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.Assertions.Must;
 using Random = UnityEngine.Random;
 
 public class Orb : MonoBehaviour
@@ -23,7 +22,9 @@ public class Orb : MonoBehaviour
     private OrbFrequency _orbFrequency;
     private float _intensity;
 
-    [Header("Component References")]
+    [Header("Component References")] 
+    [SerializeField] private OrbNetworkedBehavior _orbNetworkedBehavior;
+    [SerializeField] private OrbsGroup _orbsGroup;
     [SerializeField] private Renderer _renderer;
     [SerializeField] private SphereCollider _collider;
     [SerializeField] private Rigidbody _rigidBody;
@@ -50,17 +51,23 @@ public class Orb : MonoBehaviour
     private float _popInDuration = 1f;
     private Vector3 _startingVelocity;
     private Vector3 _origin;
-    private Vector3 _baseScale;
 
     private float _randomNumber;
     private float _currentScale;
 
+    public event Action<Vector3> OriginChangeSent;
+    public event Action<int> BandChangeSent;
+    public event Action<bool> EnabledChangeSent; 
+
     private void Start()
     {
         _origin = new Vector3(0, 0, 0);
-        _baseScale = new Vector3(1, 1, 1);
         _rigidBody.velocity = HelperMethods.GetRandomVec3() * _velocityMultiplier;
         _randomNumber = Random.Range(0f, 1000f);
+
+        _orbNetworkedBehavior.OriginChangeReceived += ReceiveOriginChanges;
+        _orbNetworkedBehavior.BandChangeReceived += ReceiveBandChanges;
+        _orbNetworkedBehavior.EnabledChangeReceived += ReceiveEnabledChanges;
     }
     
     private void FixedUpdate()
@@ -68,7 +75,6 @@ public class Orb : MonoBehaviour
         if (_orbState == OrbState.Disabled) return;
         UpdateIntensity();
         UpdateRigidbodies();
-        // UpdateScale();
 
         SetScale();
     }
@@ -82,6 +88,11 @@ public class Orb : MonoBehaviour
         _orbFrequency = freq;
         _origin = origin;
         SetLocalBounds(_origin);
+        
+        
+        OriginChangeSent?.Invoke(_origin);
+        BandChangeSent?.Invoke(freq.band);
+        EnabledChangeSent?.Invoke(true);
     }
     
     public void DisableOrb()
@@ -89,6 +100,28 @@ public class Orb : MonoBehaviour
         _orbState = OrbState.Disabled;
         _renderer.enabled = false;
         transform.position = new Vector3(0, 100, 0);
+        
+        EnabledChangeSent?.Invoke(false);
+    }
+
+    private void ReceiveOriginChanges(Vector3 newOrigin)
+    {
+        _origin = newOrigin;
+        SetLocalBounds(newOrigin);
+    }
+
+    private void ReceiveBandChanges(int newBand)
+    {
+        var newFreq = new OrbFrequency(newBand, _orbsGroup.Colors[newBand]);
+        _orbFrequency = newFreq;
+    }
+
+    private void ReceiveEnabledChanges(bool newEnabled)
+    {
+        if (newEnabled)
+            _renderer.enabled = true;
+        else
+            DisableOrb();
     }
 
     private IEnumerator PopIn()
@@ -175,15 +208,6 @@ public class Orb : MonoBehaviour
         }
     }
 
-   
-    private void UpdateScale()
-    {
-        var dist = Vector3.Distance(transform.position, _origin);
-        var scale = Mathf.Clamp((_xBounds / 1.0f) / dist, _minScale, _maxScale);
-
-        transform.localScale = _baseScale * scale;
-    }
-
     private void SetScale()
     {
         var sinScale = Mathf.Sin((Time.unscaledTime + _randomNumber) * _scalingSpeed) * 0.5f + 0.5f; // fluctuates between 0 and 1
@@ -204,5 +228,10 @@ public class Orb : MonoBehaviour
         _rigidBody.velocity = -_rigidBody.velocity;
     }
 
-    
+    private void OnDisable()
+    {
+        _orbNetworkedBehavior.OriginChangeReceived -= ReceiveOriginChanges;
+        _orbNetworkedBehavior.BandChangeReceived -= ReceiveBandChanges;
+        _orbNetworkedBehavior.EnabledChangeReceived -= ReceiveEnabledChanges;
+    }
 }

@@ -49,7 +49,7 @@ namespace Niantic.ARDK.Extensions
   {
     private IARNetworking _arNetworking;
     private ARSessionManager _arSessionManager;
-    private NetworkSessionManager _networkSessionManager;
+    [SerializeField] private NetworkSessionManager _networkSessionManager;
 
     private bool _shouldBeRunning;
     private bool _needToRecreate;
@@ -118,6 +118,7 @@ namespace Niantic.ARDK.Extensions
 
       _networkSessionManager._InitializeWithIdentifier(arSession.StageIdentifier);
       CreateARNetworking(arSession);
+      
 
       if (_shouldBeRunning)
         EnableSessionManagers();
