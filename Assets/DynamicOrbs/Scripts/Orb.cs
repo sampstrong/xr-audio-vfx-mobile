@@ -69,7 +69,7 @@ public class Orb : MonoBehaviour
         _rigidBody.velocity = HelperMethods.GetRandomVec3() * _velocityMultiplier;
         _randomNumber = Random.Range(0f, 1000f);
 
-        
+        if (!_orbNetworkedBehavior) return;
         _orbNetworkedBehavior.VelocityChangeReceived += ReceiveVelocityChanges;
         _orbNetworkedBehavior.OriginChangeReceived += ReceiveOriginChanges;
         _orbNetworkedBehavior.BandChangeReceived += ReceiveBandChanges;
@@ -83,7 +83,8 @@ public class Orb : MonoBehaviour
         UpdateIntensity();
         UpdateRigidbodies();
         SetScale();
-        
+
+        if (MultiplayerManager.playerMode != MultiplayerManager.PlayerMode.Multiplayer) return;
         VelocityChangeSent?.Invoke(_rigidBody.velocity);
     }
 
@@ -96,8 +97,8 @@ public class Orb : MonoBehaviour
         _orbFrequency = freq;
         _origin = origin;
         SetLocalBounds(_origin);
-        
-        
+
+        if (MultiplayerManager.playerMode != MultiplayerManager.PlayerMode.Multiplayer) return;
         OriginChangeSent?.Invoke(_origin);
         BandChangeSent?.Invoke(freq.band);
         EnabledChangeSent?.Invoke(true);
@@ -109,12 +110,13 @@ public class Orb : MonoBehaviour
         _renderer.enabled = false;
         transform.position = new Vector3(0, 100, 0);
         
+        if (MultiplayerManager.playerMode != MultiplayerManager.PlayerMode.Multiplayer) return;
         EnabledChangeSent?.Invoke(false);
     }
 
     private void ReceiveVelocityChanges(Vector3 newVelocity)
     {
-        if (HlapiManager.IsHost) return;
+        if (MultiplayerManager.IsHost) return;
         _rigidBody.velocity = newVelocity;
     }
 
@@ -163,6 +165,8 @@ public class Orb : MonoBehaviour
     {
         // if (!HlapiManager.IsHost) return;
         _intensity = AudioSpectrumReader.audioBandIntensityBuffer[_orbFrequency.band];
+        
+        if (MultiplayerManager.playerMode != MultiplayerManager.PlayerMode.Multiplayer) return;
         BandIntensityChangeSent?.Invoke(_intensity);
     }
 
@@ -253,6 +257,7 @@ public class Orb : MonoBehaviour
 
     private void OnDisable()
     {
+        if (!_orbNetworkedBehavior) return;
         _orbNetworkedBehavior.OriginChangeReceived -= ReceiveOriginChanges;
         _orbNetworkedBehavior.BandChangeReceived -= ReceiveBandChanges;
         _orbNetworkedBehavior.EnabledChangeReceived -= ReceiveEnabledChanges;

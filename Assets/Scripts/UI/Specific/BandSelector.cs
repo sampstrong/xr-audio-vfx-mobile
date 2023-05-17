@@ -32,6 +32,7 @@ public class BandSelector : MonoBehaviour
     {
         yield return new WaitForSeconds(1f);
         ChangeColor(orbsGroup.Colors[_currentBand - 1]);
+        _bands[0].image.color = _selectedColor;
     }
 
     private void Update()
@@ -62,11 +63,13 @@ public class BandSelector : MonoBehaviour
                 {
                     if (curRaysastResult.gameObject == band.gameObject)
                     {
+                        _bands[_currentBand - 1].image.color = _deselectedColor;
+                        Debug.Log($"band highlighted: {band.name}");
                         band.image.color = _selectedColor;
                         _currentBand = band.userIndex;
                     }
-                    else
-                        band.image.color = _deselectedColor;
+                    //else
+                        //band.image.color = _deselectedColor;
                 }
                 
                 return true;

@@ -1,4 +1,3 @@
-using System;
 using Niantic.ARDK.AR.ARSessionEventArgs;
 using Niantic.ARDK.AR.Networking;
 using Niantic.ARDK.AR.Networking.ARNetworkingEventArgs;
@@ -12,9 +11,17 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class HlapiManager : MonoBehaviour
+public class MultiplayerManager : MonoBehaviour
 {
     public static bool IsHost => _isHost;
+
+    public enum PlayerMode
+    {
+      SinglePlayer = 0,
+      Multiplayer = 1
+    }
+
+    public static PlayerMode playerMode;
     
     [Header("UI")]
     [SerializeField] private Button joinButton = null;

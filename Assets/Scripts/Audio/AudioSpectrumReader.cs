@@ -57,9 +57,12 @@ public class AudioSpectrumReader : MonoBehaviour
         {
             if (Microphone.devices.Length > 0)
             {
+                //var sampleRate = AudioSettings.outputSampleRate;
+                var sampleRate = 44100; // testing this value
+                
                 selectedDevice = Microphone.devices[0];
                 _audioSource.outputAudioMixerGroup = mixerGroupMicrophone;
-                _audioSource.clip = Microphone.Start(selectedDevice, true, 10, AudioSettings.outputSampleRate);
+                _audioSource.clip = Microphone.Start(selectedDevice, true, 10, sampleRate);
                 if (Microphone.IsRecording(selectedDevice))
                 {
                     while (!(Microphone.GetPosition(selectedDevice) > 0))

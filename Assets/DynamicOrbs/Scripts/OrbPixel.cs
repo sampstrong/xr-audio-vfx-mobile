@@ -29,6 +29,7 @@ public class OrbPixel : MonoBehaviour
         TouchManager.TouchEnded += HandleTouchEnded;
         OrbsGroup.InteractionStateChanged += HandleInteractionChange;
 
+        if (!_pixelBehavior) return;
         _pixelBehavior.EnabledChangeReceived += ReceiveEnabledChange;
     }
 
@@ -41,12 +42,16 @@ public class OrbPixel : MonoBehaviour
     private void Init()
     {
         _renderer.enabled = true;
+        
+        if (MultiplayerManager.playerMode != MultiplayerManager.PlayerMode.Multiplayer) return;
         EnabledChangeSent?.Invoke(true);
     }
     
     private void Disable()
     {
         _renderer.enabled = false;
+        
+        if (MultiplayerManager.playerMode != MultiplayerManager.PlayerMode.Multiplayer) return;
         EnabledChangeSent?.Invoke(false);
     }
 
@@ -153,6 +158,9 @@ public class OrbPixel : MonoBehaviour
         TouchManager.MultiTouchHappened -= HandleMultiTouchHappened;
         TouchManager.TouchEnded -= HandleTouchEnded;
         OrbsGroup.InteractionStateChanged -= HandleInteractionChange;
+        
+        if (!_pixelBehavior) return;
+        _pixelBehavior.EnabledChangeReceived -= ReceiveEnabledChange;
     }
 
     private void ResumeProcesses()
@@ -161,5 +169,8 @@ public class OrbPixel : MonoBehaviour
         TouchManager.MultiTouchHappened += HandleMultiTouchHappened;
         TouchManager.TouchEnded += HandleTouchEnded;
         OrbsGroup.InteractionStateChanged += HandleInteractionChange;
+        
+        if (!_pixelBehavior) return;
+        _pixelBehavior.EnabledChangeReceived += ReceiveEnabledChange;
     }
 }
