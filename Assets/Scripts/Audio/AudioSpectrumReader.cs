@@ -80,6 +80,7 @@ public class AudioSpectrumReader : MonoBehaviour
         {
             _audioSource.outputAudioMixerGroup = mixerGroupMaster;
             _audioSource.clip = audioClip;
+            _audioSource.Play();
         }
     }
     

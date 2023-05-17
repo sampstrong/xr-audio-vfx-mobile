@@ -6,6 +6,7 @@ using Random = UnityEngine.Random;
 
 public class OrbPixel : MonoBehaviour
 {
+    [SerializeField] private OrbPixelNetworkedBehavior _pixelBehavior;
     [SerializeField] private OrbsGroup _orbsGroup;
     [SerializeField] private Renderer _renderer;
     [SerializeField] private float _shiftInterval = 0.5f;
@@ -17,6 +18,8 @@ public class OrbPixel : MonoBehaviour
 
     private float _shiftTimer = 0f;
 
+    public event Action<bool> EnabledChangeSent;
+
     private void Start()
     {
         Disable();
@@ -25,6 +28,8 @@ public class OrbPixel : MonoBehaviour
         TouchManager.MultiTouchHappened += HandleMultiTouchHappened;
         TouchManager.TouchEnded += HandleTouchEnded;
         OrbsGroup.InteractionStateChanged += HandleInteractionChange;
+
+        _pixelBehavior.EnabledChangeReceived += ReceiveEnabledChange;
     }
 
     private void HandleInteractionChange(OrbsGroup.OrbInteractionState state)
@@ -36,19 +41,20 @@ public class OrbPixel : MonoBehaviour
     private void Init()
     {
         _renderer.enabled = true;
+        EnabledChangeSent?.Invoke(true);
     }
     
     private void Disable()
     {
         _renderer.enabled = false;
+        EnabledChangeSent?.Invoke(false);
     }
 
     private void HandleTouchStarted(Touch touch, TouchManager.TouchZone zone)
     {
         if (OrbsGroup.InteractionState == OrbsGroup.OrbInteractionState.Create) return;
         if (zone != TouchManager.TouchZone.World) return;
-        
-        
+
         Init();
     }
 
@@ -75,6 +81,11 @@ public class OrbPixel : MonoBehaviour
             Init();
         else
             Disable();
+    }
+
+    private void ReceiveEnabledChange(bool newEnabled)
+    {
+        _renderer.enabled = newEnabled;
     }
 
     private void Update()
@@ -132,6 +143,8 @@ public class OrbPixel : MonoBehaviour
     {
         if (!hasFocus)
             EndProcesses();
+        else
+            ResumeProcesses();
     }
 
     private void EndProcesses()

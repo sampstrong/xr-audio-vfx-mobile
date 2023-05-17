@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UIElements;
 using Random = UnityEngine.Random;
 
 public class Orb : MonoBehaviour
@@ -55,8 +56,11 @@ public class Orb : MonoBehaviour
     private float _randomNumber;
     private float _currentScale;
 
+    
+    public event Action<Vector3> VelocityChangeSent;
     public event Action<Vector3> OriginChangeSent;
     public event Action<int> BandChangeSent;
+    public event Action<float> BandIntensityChangeSent;
     public event Action<bool> EnabledChangeSent; 
 
     private void Start()
@@ -65,8 +69,11 @@ public class Orb : MonoBehaviour
         _rigidBody.velocity = HelperMethods.GetRandomVec3() * _velocityMultiplier;
         _randomNumber = Random.Range(0f, 1000f);
 
+        
+        _orbNetworkedBehavior.VelocityChangeReceived += ReceiveVelocityChanges;
         _orbNetworkedBehavior.OriginChangeReceived += ReceiveOriginChanges;
         _orbNetworkedBehavior.BandChangeReceived += ReceiveBandChanges;
+        _orbNetworkedBehavior.BandIntensityChangeReceived += ReceiveBandIntensityChanges;
         _orbNetworkedBehavior.EnabledChangeReceived += ReceiveEnabledChanges;
     }
     
@@ -75,8 +82,9 @@ public class Orb : MonoBehaviour
         if (_orbState == OrbState.Disabled) return;
         UpdateIntensity();
         UpdateRigidbodies();
-
         SetScale();
+        
+        VelocityChangeSent?.Invoke(_rigidBody.velocity);
     }
 
     public void InitOrb(Vector3 origin, Vector3 position, Vector3 velocity, OrbFrequency freq)
@@ -104,6 +112,12 @@ public class Orb : MonoBehaviour
         EnabledChangeSent?.Invoke(false);
     }
 
+    private void ReceiveVelocityChanges(Vector3 newVelocity)
+    {
+        if (HlapiManager.IsHost) return;
+        _rigidBody.velocity = newVelocity;
+    }
+
     private void ReceiveOriginChanges(Vector3 newOrigin)
     {
         _origin = newOrigin;
@@ -114,6 +128,11 @@ public class Orb : MonoBehaviour
     {
         var newFreq = new OrbFrequency(newBand, _orbsGroup.Colors[newBand]);
         _orbFrequency = newFreq;
+    }
+    
+    private void ReceiveBandIntensityChanges(float newBandIntensity)
+    {
+        _intensity = newBandIntensity;
     }
 
     private void ReceiveEnabledChanges(bool newEnabled)
@@ -142,7 +161,9 @@ public class Orb : MonoBehaviour
 
     private void UpdateIntensity()
     {
+        // if (!HlapiManager.IsHost) return;
         _intensity = AudioSpectrumReader.audioBandIntensityBuffer[_orbFrequency.band];
+        BandIntensityChangeSent?.Invoke(_intensity);
     }
 
     private void SetLocalBounds(Vector3 origin)
@@ -159,6 +180,8 @@ public class Orb : MonoBehaviour
     private void UpdateRigidbodies()
     {
         transform.rotation = Quaternion.identity;
+
+        // if (!HlapiManager.IsHost) return; // need to add logic for if in multiplayer
         
         var p = _rigidBody.transform.position;
         var v = _rigidBody.velocity;

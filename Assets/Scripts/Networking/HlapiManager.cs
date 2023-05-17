@@ -1,4 +1,5 @@
 using System;
+using Niantic.ARDK.AR.ARSessionEventArgs;
 using Niantic.ARDK.AR.Networking;
 using Niantic.ARDK.AR.Networking.ARNetworkingEventArgs;
 using Niantic.ARDK.Extensions;
@@ -12,7 +13,9 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class HlapiManager : MonoBehaviour
-  {
+{
+    public static bool IsHost => _isHost;
+    
     [Header("UI")]
     [SerializeField] private Button joinButton = null;
     [SerializeField] private FeaturePreloadManager preloadManager = null;
@@ -24,7 +27,7 @@ public class HlapiManager : MonoBehaviour
     private IAuthorityReplicator _auth;
     private IARNetworking _arNetworking;
     private IPeer _self;
-    private bool _isHost;
+    private static bool _isHost;
     private bool _synced;
 
     private void Start()
@@ -35,6 +38,13 @@ public class HlapiManager : MonoBehaviour
         OnPreloadFinished(true);
       else
         preloadManager.ProgressUpdated += PreloadProgressUpdated;
+      
+      
+    }
+
+    private void OnAnchorsAdded(AnchorsArgs args)
+    {
+      Debug.Log($"Anchor Count: {args.Anchors.Count}");
     }
 
     private void PreloadProgressUpdated(FeaturePreloadManager.PreloadProgressUpdatedArgs args)
@@ -48,9 +58,7 @@ public class HlapiManager : MonoBehaviour
 
     private void OnPreloadFinished(bool success)
     {
-      if (success)
-        joinButton.interactable = true;
-      else
+      if (!success)
         Debug.LogError("Failed to download resources needed to run AR Multiplayer");
     }
 
@@ -96,6 +104,7 @@ public class HlapiManager : MonoBehaviour
       _arNetworking = args.ARNetworking;
       _arNetworking.PeerStateReceived += OnPeerStateReceived;
       _arNetworking.Networking.Connected += OnDidConnect;
+      _arNetworking.ARSession.AnchorsAdded += OnAnchorsAdded;
     }
 
     private void OnApplicationQuit()
