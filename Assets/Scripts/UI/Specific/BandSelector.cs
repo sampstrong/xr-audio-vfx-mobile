@@ -64,7 +64,6 @@ public class BandSelector : MonoBehaviour
                     if (curRaysastResult.gameObject == band.gameObject)
                     {
                         _bands[_currentBand - 1].image.color = _deselectedColor;
-                        Debug.Log($"band highlighted: {band.name}");
                         band.image.color = _selectedColor;
                         _currentBand = band.userIndex;
                     }

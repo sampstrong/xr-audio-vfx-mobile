@@ -193,6 +193,7 @@ public class OrbsGroup : MonoBehaviour
         EndProcesses();
     }
 
+#if UNITY_STANDALONE && !UNITY_EDITOR
     private void OnApplicationFocus(bool hasFocus)
     {
         if (!hasFocus)
@@ -200,6 +201,7 @@ public class OrbsGroup : MonoBehaviour
         else
             ResumeProcesses();
     }
+#endif
 
     private void EndProcesses()
     {
