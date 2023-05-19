@@ -75,6 +75,8 @@ namespace Niantic.ARDK.Extensions
 
     private bool _shouldBeRunning;
 
+    public event Action ARSessionCreated; 
+
     public IARSession ARSession { get; private set; }
 
     public ARSessionRunOptions RunOptions
@@ -225,6 +227,8 @@ namespace Niantic.ARDK.Extensions
 
       ARLog._DebugFormat("Created {0} ARSession: {1}.", false, ARSession.RuntimeEnvironment, ARSession.StageIdentifier);
 
+      ARSessionCreated?.Invoke();
+      
       // Just in case the dev disposes the ARSession themselves instead of through this manager
       ARSession.Deinitialized += (_) => ARSession = null;
     }

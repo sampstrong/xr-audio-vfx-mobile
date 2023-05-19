@@ -57,7 +57,7 @@ public class AudioSpectrumReader : MonoBehaviour
         {
             if (Microphone.devices.Length > 0)
             {
-                //var sampleRate = AudioSettings.outputSampleRate;
+                // var sampleRate = AudioSettings.outputSampleRate;
                 var sampleRate = 44100; // testing this value
                 
                 selectedDevice = Microphone.devices[0];

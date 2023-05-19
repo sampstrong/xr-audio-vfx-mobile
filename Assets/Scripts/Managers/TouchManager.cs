@@ -29,6 +29,7 @@ public class TouchManager : MonoBehaviour
 
     private static Vector2 _touchPos;
     private static bool _isTouching;
+    private static bool _touchEnabled = true;
 
     private int _topSize;
     private int _worldSizeWithSpectrum;
@@ -51,6 +52,8 @@ public class TouchManager : MonoBehaviour
 
     private void Update()
     {
+        if (!_touchEnabled) return;
+        
         SetTouchZones();
 
         // change touch count to switch statement
@@ -189,5 +192,15 @@ public class TouchManager : MonoBehaviour
             default:
                 break;
         }
+    }
+
+    public static void EnableTouch()
+    {
+        _touchEnabled = true;
+    }
+
+    public static void DisableTouch()
+    {
+        _touchEnabled = false;
     }
 }

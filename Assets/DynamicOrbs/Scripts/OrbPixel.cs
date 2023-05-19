@@ -29,7 +29,7 @@ public class OrbPixel : MonoBehaviour
         TouchManager.TouchEnded += HandleTouchEnded;
         OrbsGroup.InteractionStateChanged += HandleInteractionChange;
 
-        if (!_pixelBehavior) return;
+        
         _pixelBehavior.EnabledChangeReceived += ReceiveEnabledChange;
     }
 
@@ -95,6 +95,8 @@ public class OrbPixel : MonoBehaviour
 
     private void Update()
     {
+        transform.rotation = Quaternion.identity;
+        
         if (OrbsGroup.InteractionState == OrbsGroup.OrbInteractionState.Create) return;
 
         _shiftTimer += Time.deltaTime;

@@ -20,11 +20,10 @@ public class MultiplayerManager : MonoBehaviour
       SinglePlayer = 0,
       Multiplayer = 1
     }
-
-    public static PlayerMode playerMode;
+   
+    public static PlayerMode playerMode = PlayerMode.SinglePlayer;
     
     [Header("UI")]
-    [SerializeField] private Button joinButton = null;
     [SerializeField] private FeaturePreloadManager preloadManager = null;
     [SerializeField] private ARNetworkingManager _networkingManager;
     [SerializeField] private TextMeshProUGUI peerState;
@@ -45,8 +44,11 @@ public class MultiplayerManager : MonoBehaviour
         OnPreloadFinished(true);
       else
         preloadManager.ProgressUpdated += PreloadProgressUpdated;
-      
-      
+    }
+
+    public void StartMultiPlayer()
+    {
+      playerMode = PlayerMode.Multiplayer;
     }
 
     private void OnAnchorsAdded(AnchorsArgs args)

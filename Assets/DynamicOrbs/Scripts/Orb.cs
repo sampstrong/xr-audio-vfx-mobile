@@ -69,7 +69,7 @@ public class Orb : MonoBehaviour
         _rigidBody.velocity = HelperMethods.GetRandomVec3() * _velocityMultiplier;
         _randomNumber = Random.Range(0f, 1000f);
 
-        if (!_orbNetworkedBehavior) return;
+        
         _orbNetworkedBehavior.VelocityChangeReceived += ReceiveVelocityChanges;
         _orbNetworkedBehavior.OriginChangeReceived += ReceiveOriginChanges;
         _orbNetworkedBehavior.BandChangeReceived += ReceiveBandChanges;
