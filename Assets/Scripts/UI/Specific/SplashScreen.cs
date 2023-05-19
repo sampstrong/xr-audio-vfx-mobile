@@ -1,17 +1,17 @@
 using System.Collections;
-using Niantic.ARDK.AR.ARSessionEventArgs;
 using Niantic.ARDK.Extensions;
 using UnityEngine;
 
 public class SplashScreen : MonoBehaviour
 {
+    [SerializeField] private GameObject _splashScreenObject;
     [SerializeField] private ARSessionManager _arSessionManager;
     [SerializeField] private CanvasGroup _canvasGroup;
     [SerializeField] private float _fadeDuration = 0.5f;
 
-    private void Start()
+    private void Awake()
     {
-        // _arSessionManager.ARSession.Ran += StartFade;
+        _splashScreenObject.SetActive(true);
         _arSessionManager.ARSessionCreated += StartFade;
     }
 
@@ -33,5 +33,6 @@ public class SplashScreen : MonoBehaviour
         }
 
         _canvasGroup.alpha = 0.0f;
+        _splashScreenObject.SetActive(false);
     }
 }

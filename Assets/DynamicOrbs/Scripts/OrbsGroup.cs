@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 // [ExecuteInEditMode]
 public class OrbsGroup : MonoBehaviour
@@ -17,6 +19,7 @@ public class OrbsGroup : MonoBehaviour
     [SerializeField] private LaunchEffect _launchEffect;
 
     [SerializeField] private Light _light;
+    [SerializeField] private Button _resetButton;
     
     [Header("Colors")] 
     [ColorUsageAttribute(true, true)] 
@@ -42,7 +45,6 @@ public class OrbsGroup : MonoBehaviour
     }
 
     public static OrbInteractionState InteractionState = OrbInteractionState.Create;
-
     public static event Action<OrbInteractionState> InteractionStateChanged;
 
     void Start()
@@ -107,6 +109,9 @@ public class OrbsGroup : MonoBehaviour
         var freq = new OrbFrequency(band, _colors[band]);
         Orb orb;
         
+        if (_disabledOrbs.Count == _objects.Count)
+            _resetButton.gameObject.SetActive(true);
+        
         if (_disabledOrbs.Count > 0)
         {
             // take from list of disabled orbs if there are any
@@ -131,7 +136,7 @@ public class OrbsGroup : MonoBehaviour
     /// Disable all orbs and make them ready to launch
     /// </summary>
     [Button]
-    private void ResetOrbs()
+    public void ResetOrbs()
     {
         _frequencyColors.Clear();
         _frequencyColors.AddRange(_colors);
